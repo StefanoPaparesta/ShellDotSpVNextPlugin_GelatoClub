@@ -1,0 +1,1 @@
+copy /Y "D:\DotSp\Progetti\TraceDotSp\ShellDotSpVNextPlugin\GelatoClub\plugins\ShellDotSp.Plugin.GelatoClubCore\ShellDotSp.config" "D:\DotSp\Progetti\TraceDotSp\ShellDotSpVNext\ShellDotSp.UI\bin\Debug\ShellDotSp.config
