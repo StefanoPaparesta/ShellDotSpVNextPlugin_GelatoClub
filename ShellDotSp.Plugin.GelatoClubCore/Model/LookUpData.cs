@@ -8,5 +8,6 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Model
         public string Codice { get; set; }
         public string Descrizione { get; set; }
     }
+
     public class LookUpDataCollection : BindingList<LookUpData> { }
 }

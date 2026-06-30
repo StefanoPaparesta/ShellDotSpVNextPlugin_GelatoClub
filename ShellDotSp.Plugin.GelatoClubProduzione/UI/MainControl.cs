@@ -26,6 +26,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
         private MsgBoxHelper _msg = new MsgBoxHelper("GELATO CLUB");
         private Logger _logger = LogManager.GetCurrentClassLogger();
         private bool _dataConfezionamentoManuale = false;
+        private bool _etichettaSelFromPresenter = false;
 
         public MainControlGelatoClubProduzione()
         {
@@ -73,6 +74,11 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
             txDataConfezionamento.Enabled = false;
 
             btnInvia.Enabled = false;
+            lkDescrizione1.Enabled = false;
+            lkDescrizione2.Enabled = false;
+            lkEtichette.Enabled = false;
+            btnManageDesc1.Enabled = false;
+            btnManageDesc2.Enabled = false;
         }
 
         public void UpdateUI(MessaggioPlugin messaggio)
@@ -96,6 +102,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
         private void ViewInizializzata()
         {
             bndLinee.DataSource = _presenter.Linee;
+            bndEtichette.DataSource = _presenter.Etichette;
             lblArticolo.Cursor = Cursors.Default;
         }
         private void LineaSelezionata()
@@ -126,6 +133,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 lblArticolo.Cursor = Cursors.Hand;
 
                 btnInvia.Enabled = _presenter.ArticoloSelezionato != null;
+
             }
             else
             {
@@ -135,6 +143,9 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
         }
         private void ArticoloSelezionato()
         {
+
+            lkEtichette.EditValue = null;
+            lkEtichette.Enabled = _presenter.ArticoloSelezionato != null;
 
             if (_presenter.ArticoloSelezionato != null)
             {
@@ -153,6 +164,36 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 lblQtaScatola.Text = _presenter.ArticoloSelezionato.QuantBarcode.ToString("f0");
 
                 _presenter.CalcoloDataScadenza(CalcoloScadenza.Mesi, _presenter.ArticoloSelezionato.MesiValiditaLotto, _presenter.ArticoloSelezionato.ScadenzaAFineMese == "S");
+
+                bndDescrizione1.Clear();
+                bndDescrizione2.Clear();
+
+                _presenter.GetTesti();
+
+                lkDescrizione1.Properties.ForceInitialize();
+                lkDescrizione2.Properties.ForceInitialize();
+
+                var (idTesto1, idTesto2) = _presenter.SelezionaTestiPers();
+
+                if (idTesto1 != 0)
+                {
+                    lkDescrizione1.EditValue = idTesto1;
+                }
+                else
+                {
+                    lkDescrizione1.EditValue = null;
+                }
+
+                if (idTesto2 != 0)
+                {
+                    lkDescrizione2.EditValue = idTesto2;
+                }
+                else
+                {
+                    lkDescrizione2.EditValue = null;
+                }
+
+                _presenter.GetEtichetta();
             }
             else
             {
@@ -170,6 +211,17 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 lblBarcode.Text = string.Empty;
                 lblDataScadenza.Text = string.Empty;
                 lblQtaScatola.Text = string.Empty;
+
+                lkDescrizione1.Enabled = _presenter.ArticoloSelezionato != null;
+                lkDescrizione2.Enabled = _presenter.ArticoloSelezionato != null;
+                btnManageDesc1.Enabled = _presenter.ArticoloSelezionato != null;
+                btnManageDesc2.Enabled = _presenter.ArticoloSelezionato != null;
+
+                lkDescrizione1.EditValue = null;
+                lkDescrizione2.EditValue = null;
+                bndDescrizione1.Clear();
+                bndDescrizione2.Clear();
+
             }
 
             _presenter.VerificaStatoLineaCorrente();
@@ -182,6 +234,21 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
         {
             lblDataScadenza.Text = _presenter.DataScadenza.ToString("dd/MM/yyyy");
             _logger.Info("DATA SCADENZA CALCOLATA {dt:dd/MM/yyyy}", _presenter.DataScadenza);
+        }
+        private void TestiInizializzati()
+        {
+            lkDescrizione1.Enabled = _presenter.ArticoloSelezionato != null;
+            lkDescrizione2.Enabled = _presenter.ArticoloSelezionato != null;
+            btnManageDesc1.Enabled = _presenter.ArticoloSelezionato != null;
+            btnManageDesc2.Enabled = _presenter.ArticoloSelezionato != null;
+
+            bndDescrizione1.DataSource = _presenter.Testi1;
+            bndDescrizione2.DataSource = _presenter.Testi2;
+        }
+        private void EtichettaInizializzata()
+        {
+            _etichettaSelFromPresenter = true;
+            lkEtichette.EditValue = _presenter.EtichettaSelezionata?.CodiceLayout ?? null;
         }
 
         private void lkLinee_EditValueChanged(object sender, EventArgs e)
@@ -209,6 +276,14 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
 
         private void btnInvia_Click(object sender, EventArgs e)
         {
+            var errors = _presenter.VerificaDatiStampa();
+
+            if (errors.Count != 0)
+            {
+                _msg.ShowErrors(errors);
+                return;
+            }
+
             var response = _msg.Question("Confermi l'invio dell'articolo selezionato in produzione ?");
 
             if (response == DialogResult.Yes)
@@ -257,6 +332,74 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
             _presenter.SetDataConfezionamento(txDataConfezionamento.DateTime);
 
             _presenter.CalcolaLotto();
+        }
+
+        private void lkDescrizione1_EditValueChanged(object sender, EventArgs e)
+        {
+            var testo1 = (EtichettaTesto)lkDescrizione1.GetSelectedDataRow();
+
+            _presenter.SetTesto1(testo1);
+        }
+
+        private void lkDescrizione2_EditValueChanged(object sender, EventArgs e)
+        {
+            var testo2 = (EtichettaTesto)lkDescrizione2.GetSelectedDataRow();
+
+            _presenter.SetTesto2(testo2);
+        }
+
+        private void btnManageDesc1_Click(object sender, EventArgs e)
+        {
+            using (FrmTestiPersonalizzati frm = new FrmTestiPersonalizzati(_presenter))
+            {
+                frm.TipoTesto = 1;
+                frm.CodiceArticolo = _presenter.ArticoloSelezionato.CodiceArticolo;
+
+                frm.ShowDialog();
+
+                _presenter.GetTesti();
+
+                var testoSelezionato = (EtichettaTesto)lkDescrizione1.GetSelectedDataRow();
+
+                if (testoSelezionato != null)
+                {
+                    var exist = _presenter.VerificaEsistenzaTesto(testoSelezionato.Id, 1);
+
+                    if (!exist)
+                        lkDescrizione1.EditValue = null;
+                }
+                else
+                {
+                    lkDescrizione1.EditValue = null;
+                }
+            }
+        }
+
+        private void lkEtichette_EditValueChanged(object sender, EventArgs e)
+        {
+            var etichetta = (Etichetta)lkEtichette.GetSelectedDataRow();
+
+            if (!_etichettaSelFromPresenter)
+            {
+                if (etichetta != null)
+                {
+                    EtichettaPersonalizzata etiPers = new EtichettaPersonalizzata
+                    {
+                        CodiceArticolo = _presenter.ArticoloSelezionato.CodiceArticolo,
+                        CodiceLayout = etichetta.Codice
+                    };
+
+                    _presenter.SetEtichetta(etiPers);
+                }
+                else
+                {
+                    _presenter.SetEtichetta(null);
+                }
+            }
+            else
+            {
+                _etichettaSelFromPresenter = false;
+            }
         }
     }
 }

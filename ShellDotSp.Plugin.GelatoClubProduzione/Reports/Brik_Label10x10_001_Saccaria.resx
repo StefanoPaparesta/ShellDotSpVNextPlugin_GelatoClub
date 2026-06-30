@@ -117,48 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="alciati_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\alciati_logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="erbalatte_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\erbalatte_logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="rogelfrut_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\rogelfrut_logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ever_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ever_logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RivarenoLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\RivarenoLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="LogoCoolxp" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\LogoCoolxp.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="zappala_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\zappala_logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="hand_delivery_filled" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\hand_delivery_filled.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="mozzarellando_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\mozzarellando_logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Test" xml:space="preserve">
-    <value>Test</value>
-    <comment>Test</comment>
-  </data>
-  <data name="padania_alimenti_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\padania_alimenti_logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="LogoYspira" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\LogoYspira.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="saccaria_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\saccaria_logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="tobia_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\tobia_logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
+  <metadata name="bindingSource1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
 </root>

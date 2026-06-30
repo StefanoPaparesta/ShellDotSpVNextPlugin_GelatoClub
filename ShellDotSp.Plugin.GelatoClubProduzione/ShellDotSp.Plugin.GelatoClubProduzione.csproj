@@ -116,12 +116,84 @@
     <Compile Include="Forms\FrmArticoli.Designer.cs">
       <DependentUpon>FrmArticoli.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FrmTestiPersonalizzati.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmTestiPersonalizzati.Designer.cs">
+      <DependentUpon>FrmTestiPersonalizzati.cs</DependentUpon>
+    </Compile>
     <Compile Include="Interfaces\IFooterView.cs" />
     <Compile Include="Interfaces\IMainView.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Presenters\FooterPresenter.cs" />
     <Compile Include="Presenters\MainPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reports\Brik_Label10x10_001_Tobia.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Tobia.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_Tobia.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_IFumuso.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_IFumuso.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_IFumuso.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Ever.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Ever.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_Ever.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Saccaria.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Saccaria.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_Saccaria.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Zappala.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Zappala.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_Zappala.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Mozzarellando.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Mozzarellando.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_Mozzarellando.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_PadaniaAlimenti.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_PadaniaAlimenti.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_PadaniaAlimenti.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_RogelFrut.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_RogelFrut.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_RogelFrut.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Erbalatte.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Erbalatte.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_Erbalatte.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_CoolXp.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_CoolXp.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_CoolXp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Alciati.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Brik_Label10x10_001_Alciati.Designer.cs">
+      <DependentUpon>Brik_Label10x10_001_Alciati.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reports\Label10x10_001_Rivareno.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -155,7 +227,43 @@
     <EmbeddedResource Include="Forms\FrmArticoli.resx">
       <DependentUpon>FrmArticoli.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FrmTestiPersonalizzati.resx">
+      <DependentUpon>FrmTestiPersonalizzati.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_Tobia.resx">
+      <DependentUpon>Brik_Label10x10_001_Tobia.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_IFumuso.resx">
+      <DependentUpon>Brik_Label10x10_001_IFumuso.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_Ever.resx">
+      <DependentUpon>Brik_Label10x10_001_Ever.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_Saccaria.resx">
+      <DependentUpon>Brik_Label10x10_001_Saccaria.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_Zappala.resx">
+      <DependentUpon>Brik_Label10x10_001_Zappala.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_Mozzarellando.resx">
+      <DependentUpon>Brik_Label10x10_001_Mozzarellando.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_PadaniaAlimenti.resx">
+      <DependentUpon>Brik_Label10x10_001_PadaniaAlimenti.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_RogelFrut.resx">
+      <DependentUpon>Brik_Label10x10_001_RogelFrut.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_Erbalatte.resx">
+      <DependentUpon>Brik_Label10x10_001_Erbalatte.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_CoolXp.resx">
+      <DependentUpon>Brik_Label10x10_001_CoolXp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Brik_Label10x10_001_Alciati.resx">
+      <DependentUpon>Brik_Label10x10_001_Alciati.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\Label10x10_001_Rivareno.resx">
       <DependentUpon>Label10x10_001_Rivareno.cs</DependentUpon>
     </EmbeddedResource>
@@ -187,7 +295,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\DataSources\ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaCollection.datasource" />
+    <None Include="Properties\DataSources\ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection.datasource" />
+    <None Include="Resources\tobia_logo.png" />
+    <None Include="Resources\saccaria_logo.jpg" />
+    <None Include="Resources\zappala_logo.jpg" />
+    <None Include="Resources\mozzarellando_logo.png" />
+    <None Include="Resources\padania_alimenti_logo.jpg" />
+    <None Include="Resources\rogelfrut_logo.png" />
+    <None Include="Resources\erbalatte_logo.jpg" />
+    <None Include="Resources\alciati_logo.png" />
+    <None Include="Resources\ever_logo.jpg" />
     <Content Include="Resources\hand_delivery_filled.png" />
+    <None Include="Resources\LogoCoolxp.jpg" />
     <None Include="Resources\RivarenoLogo.png" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\ShellDotSp.Plugin.GelatoClubCore.Model.LookUpDataCollection.datasource" />

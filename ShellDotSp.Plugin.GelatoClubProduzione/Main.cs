@@ -49,7 +49,7 @@ namespace ShellDotSp.Plugin.DePetrisPacchi
 
         public bool Authorize => throw new NotImplementedException();
 
-        public bool ShowFooter => true;
+        public bool ShowFooter => false;
 
         public void Finalizza()
         {

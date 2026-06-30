@@ -63,9 +63,49 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap alciati_logo {
+            get {
+                object obj = ResourceManager.GetObject("alciati_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap erbalatte_logo {
+            get {
+                object obj = ResourceManager.GetObject("erbalatte_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ever_logo {
+            get {
+                object obj = ResourceManager.GetObject("ever_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap hand_delivery_filled {
             get {
                 object obj = ResourceManager.GetObject("hand_delivery_filled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LogoCoolxp {
+            get {
+                object obj = ResourceManager.GetObject("LogoCoolxp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +123,49 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap mozzarellando_logo {
+            get {
+                object obj = ResourceManager.GetObject("mozzarellando_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap padania_alimenti_logo {
+            get {
+                object obj = ResourceManager.GetObject("padania_alimenti_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap RivarenoLogo {
             get {
                 object obj = ResourceManager.GetObject("RivarenoLogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap rogelfrut_logo {
+            get {
+                object obj = ResourceManager.GetObject("rogelfrut_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap saccaria_logo {
+            get {
+                object obj = ResourceManager.GetObject("saccaria_logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -96,6 +176,26 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione {
         internal static string Test {
             get {
                 return ResourceManager.GetString("Test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap tobia_logo {
+            get {
+                object obj = ResourceManager.GetObject("tobia_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap zappala_logo {
+            get {
+                object obj = ResourceManager.GetObject("zappala_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

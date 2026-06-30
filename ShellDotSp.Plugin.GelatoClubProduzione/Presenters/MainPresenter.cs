@@ -31,6 +31,16 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         public DateTime DataScadenza { get; set; }
         public string CodiceBarcode { get; set; }
 
+        public List<EtichettaTesto> Testi1 = new List<EtichettaTesto>();
+        public List<LookUpdataTesto> TestiStandard1 = new List<LookUpdataTesto>();
+        public List<EtichettaTesto> Testi2 = new List<EtichettaTesto>();
+        public List<LookUpdataTesto> TestiStandard2 = new List<LookUpdataTesto>();
+        public List<Etichetta> Etichette { get; set; }
+        public EtichettaPersonalizzata EtichettaSelezionata { get; set; }
+
+        public EtichettaTesto Testo1Selezionato { get; set; }
+        public EtichettaTesto Testo2Selezionato { get; set; }
+
         public MainPresenter(IMainView View) : base(View)
         {
 
@@ -50,6 +60,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         {
             string sql = "SELECT * FROM fnc_get_tabella(@0)";
 
+
             Linee = Repository.Query<TabellaLookUp>(sql, "LINEE")
                 .Select(x => new LookUpData
                 {
@@ -58,6 +69,39 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                     Descrizione = x.Valore
                 })
                 .ToList();
+
+            TestiStandard1 = Repository.Query<TabellaLookUp>(sql, "TestiStandard1")
+                .Select(x => new LookUpdataTesto
+                {
+                    Id = x.Id,
+                    Codice = x.Codice,
+                    CodiceNumerico = x.CodiceNumerico,
+                    DescrizioneBreve = x.Valore,
+                    DescrizioneCompleta = x.ValoreStr1
+                })
+                .ToList();
+
+
+            TestiStandard2 = Repository.Query<TabellaLookUp>(sql, "TestiStandard2")
+                 .Select(x => new LookUpdataTesto
+                 {
+                     Id = x.Id,
+                     Codice = x.Codice,
+                     CodiceNumerico = x.CodiceNumerico,
+                     DescrizioneBreve = x.Valore,
+                     DescrizioneCompleta = x.ValoreStr1
+                 })
+                .ToList();
+
+            Etichette = Repository.Query<TabellaLookUp>(sql, "Etichette")
+               .Select(x => new Etichetta
+               {
+                   Id = x.Id,
+                   Codice = x.Codice,
+                   Valore = x.Valore,
+                   ValoreStr1 = x.ValoreStr1
+               })
+               .ToList();
         }
 
         internal void SetLineaSelezionata(LookUpData linea)
@@ -148,26 +192,60 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         {
             ReturnValue returnValue = new ReturnValue();
 
+            EtichettaTesto testo1Stampa = null;
+            EtichettaTesto testo2Stampa = null;
+            string layoutEtichetta = null;
+
+            var (testo1, testo2, continuaTesti) = GestisciTestiPers();
+
+            if (!continuaTesti)
+            {
+                returnValue.Status = ReturnValueStatus.Error;
+                returnValue.StatusMessage = $"Errore gestione testi personalizzati";
+
+                return returnValue;
+            }
+            else
+            {
+                testo1Stampa = Testi1.Where(c => c.Id == testo1.IdTesto).SingleOrDefault();
+                testo2Stampa = Testi2.Where(c => c.Id == testo2.IdTesto).SingleOrDefault();
+            }
+
+            var (etichettaPers, continuaEtichettaPers) = GestisciEtichettePers();
+
+            if (!continuaTesti)
+            {
+                returnValue.Status = ReturnValueStatus.Error;
+                returnValue.StatusMessage = $"Errore gestione etichetta personalizzata";
+
+                return returnValue;
+            }
+            else
+            {
+                layoutEtichetta = etichettaPers.CodiceLayout;
+            }
+
             try
             {
-                string etichettaFalback = "Label10x10_001";
-                string etichetta = etichettaFalback;
+
 
                 string sql = "SELECT * FROM dbo.TabellaLookUp WHERE Tabella=@0 AND Codice=@1";
                 TabellaLookUp stampante = Repository.Query<TabellaLookUp>(sql, "Stampanti", LineaSelezionata.Codice).SingleOrDefault();
 
                 Log.Info("Stampante associata alla linea: {stampante}", stampante != null ? stampante.Valore : "Nessuna");
 
-                string sqlEtichettaPers = "SELECT * FROM dbo.EtichettePersonalizzate WHERE CodiceArticolo=@0";
-                var etichettaPersonalizzata = Repository.Query<EtichettaPersonalizzata>(sqlEtichettaPers, ArticoloSelezionato.CodiceArticolo).SingleOrDefault();
 
-                if (etichettaPersonalizzata != null)
+                var etichettaReale = Etichette
+                    .Where(c => c.Codice == layoutEtichetta)
+                    .SingleOrDefault();
+
+                if (etichettaReale == null)
                 {
-                    etichetta = etichettaPersonalizzata.CodiceLayout;
-                }
+                    returnValue.Status = ReturnValueStatus.Error;
+                    returnValue.StatusMessage = $"Errore ricerca etichetta reale";
 
-                string sqlEtichettaReale = "SELECT * FROM dbo.TabellaLookUp WHERE Tabella=@0 AND Codice=@1";
-                var etichettaReale = Repository.Query<TabellaLookUp>(sqlEtichettaReale, "Etichette", etichetta).SingleOrDefault();
+                    return returnValue;
+                }
 
                 CalcoloDataScadenza(CalcoloScadenza.Mesi, ArticoloSelezionato.MesiValiditaLotto, ArticoloSelezionato.ScadenzaAFineMese == "S");
 
@@ -177,8 +255,10 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                 reportData.Lotto = Lotto;
                 reportData.DataScadenza = DataScadenza;
                 reportData.CodiceBarcode = CodiceBarcode;
+                reportData.Descrizione1 = testo1Stampa.DescrizioneCompleta;
+                reportData.Descrizione2 = testo2Stampa.DescrizioneCompleta;
 
-                string fileName = Path.Combine(_paths.Etichette, $"{etichetta}.repx");
+                string fileName = Path.Combine(_paths.Etichette, $"{etichettaReale.Valore}.repx");
 
                 if (File.Exists(fileName))
                 {
@@ -189,7 +269,6 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
 
                         report.LoadLayout(fileName);
                         report.DataSource = ds;
-                        //report.Print(stampante.Valore);
                         StampaReport(report, 10000, stampante.Valore);
                     }
                 }
@@ -203,6 +282,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
+
                 returnValue.Status = ReturnValueStatus.Error;
                 returnValue.StatusMessage = $"{ex.Message}";
             }
@@ -313,6 +393,293 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             }
 
             CodiceBarcode = bld.ToString();
+        }
+
+        internal void GetTesti()
+        {
+            string sqlGetTesti = "SELECT * FROM EtichetteTesti WHERE CodiceArticolo=@0 AND Tipo=@1 ORDER BY Id";
+
+            var testi1 = Repository.Query<EtichettaTesto>(sqlGetTesti, ArticoloSelezionato.CodiceArticolo, 1).ToList();
+
+            var testi2 = Repository.Query<EtichettaTesto>(sqlGetTesti, ArticoloSelezionato.CodiceArticolo, 2).ToList();
+
+            Testi1.Clear();
+            Testi2.Clear();
+
+            Testi1.AddRange(TestiStandard1.Select(x => new EtichettaTesto
+            {
+                Id = x.CodiceNumerico,
+                CodiceArticolo = null,
+                DescrizioneBreve = x.DescrizioneBreve,
+                DescrizioneCompleta = x.DescrizioneCompleta
+            })
+            .ToList());
+            Testi1.AddRange(testi1);
+
+            Testi2.AddRange(TestiStandard2.Select(x => new EtichettaTesto
+            {
+                Id = x.CodiceNumerico,
+                CodiceArticolo = null,
+                DescrizioneBreve = x.DescrizioneBreve,
+                DescrizioneCompleta = x.DescrizioneCompleta
+            })
+           .ToList());
+            Testi2.AddRange(testi2);
+
+            View.UpdateUI(MessaggioPlugin.TestiInizializzati);
+        }
+
+        internal void GetEtichetta()
+        {
+            string sqlGetEtichetta = "SELECT * FROM EtichettePersonalizzate WHERE CodiceArticolo=@0";
+
+            EtichettaSelezionata = Repository
+                .Query<EtichettaPersonalizzata>(sqlGetEtichetta, ArticoloSelezionato.CodiceArticolo)
+                .SingleOrDefault();
+
+            View.UpdateUI(MessaggioPlugin.EtichettaInizializzata);
+        }
+
+        internal List<EtichettaTesto> GetTesti(int tipoTesto, string codiceArticolo)
+        {
+            List<EtichettaTesto> testi = new List<EtichettaTesto>();
+
+            string sql = "SELECT * FROM EtichetteTesti WHERE CodiceArticolo=@0 AND Tipo=@1 ORDER BY Id";
+
+            testi = Repository.Query<EtichettaTesto>(sql, codiceArticolo, tipoTesto).ToList();
+
+            return testi;
+        }
+
+        internal void SetTesto1(EtichettaTesto testo)
+        {
+            Testo1Selezionato = testo;
+        }
+
+        internal void SetTesto2(EtichettaTesto testo)
+        {
+            Testo2Selezionato = testo;
+        }
+
+        internal List<string> VerificaDatiStampa()
+        {
+            List<string> errors = new List<string>();
+
+            if (Testo1Selezionato == null)
+            {
+                errors.Add("OBBLIGATORIO SELEZIONARE IL TESTO 1");
+            }
+
+            if (Testo2Selezionato == null)
+            {
+                errors.Add("OBBLIGATORIO SELEZIONARE IL TESTO 2");
+            }
+
+            if (EtichettaSelezionata == null)
+            {
+                errors.Add("OBBLIGATORIO SELEZIONARE IL LAYOUT ETICHETTA");
+            }
+
+            return errors;
+        }
+
+        internal (int idTesto1, int idTesto2) SelezionaTestiPers()
+        {
+            int idTesto1 = 0;
+            int idTesto2 = 0;
+
+            string verificaTesto = "SELECT * FROM EtichetteTestiPersonalizzati WHERE CodiceArticolo=@0 AND Tipo=@1";
+
+            var testo1 = Repository
+                .Query<EtichettaTestoPersonalizzata>(verificaTesto, ArticoloSelezionato.CodiceArticolo, 1)
+                .SingleOrDefault();
+
+            var testo2 = Repository
+                .Query<EtichettaTestoPersonalizzata>(verificaTesto, ArticoloSelezionato.CodiceArticolo, 2)
+                .SingleOrDefault();
+
+            if (testo1 != null)
+            {
+                idTesto1 = testo1.IdTesto;
+            }
+
+            if (testo2 != null)
+            {
+                idTesto2 = testo2.IdTesto;
+            }
+
+            return (idTesto1, idTesto2);
+        }
+
+        internal (EtichettaTestoPersonalizzata testo1, EtichettaTestoPersonalizzata testo2, bool continua) GestisciTestiPers()
+        {
+            bool continua = false;
+            EtichettaTestoPersonalizzata testo1 = null;
+            EtichettaTestoPersonalizzata testo2 = null;
+
+            try
+            {
+                string verificaTesto = "SELECT * FROM EtichetteTestiPersonalizzati WHERE CodiceArticolo=@0 AND Tipo=@1";
+
+                testo1 = Repository
+                   .Query<EtichettaTestoPersonalizzata>(verificaTesto, ArticoloSelezionato.CodiceArticolo, 1)
+                   .SingleOrDefault();
+
+                testo2 = Repository
+                   .Query<EtichettaTestoPersonalizzata>(verificaTesto, ArticoloSelezionato.CodiceArticolo, 2)
+                   .SingleOrDefault();
+
+                if (testo1 == null)
+                {
+                    testo1 = new EtichettaTestoPersonalizzata();
+                }
+
+                testo1.CodiceArticolo = ArticoloSelezionato.CodiceArticolo;
+                testo1.IdTesto = Testo1Selezionato.Id;
+                testo1.Tipo = 1;
+
+                if (testo2 == null)
+                {
+                    testo2 = new EtichettaTestoPersonalizzata();
+                }
+
+                testo2.CodiceArticolo = ArticoloSelezionato.CodiceArticolo;
+                testo2.IdTesto = Testo2Selezionato.Id;
+                testo2.Tipo = 2;
+
+                if (testo1.Id == 0)
+                {
+                    Repository.Insert(testo1);
+                }
+                else
+                {
+                    Repository.Update(testo1);
+                }
+
+                if (testo2.Id == 0)
+                {
+                    Repository.Insert(testo2);
+                }
+                else
+                {
+                    Repository.Update(testo2);
+                }
+
+                continua = true;
+            }
+            catch (Exception ex)
+            {
+                continua = false;
+
+                Log.Error(ex.ToString());
+            }
+
+            return (testo1, testo2, continua);
+        }
+
+        internal (EtichettaPersonalizzata etichetta, bool continua) GestisciEtichettePers()
+        {
+            EtichettaPersonalizzata etichetta = null;
+            bool continua = false;
+
+            try
+            {
+                string verificaEtichetta = "SELECT * FROM EtichettePersonalizzate WHERE CodiceArticolo=@0";
+
+                etichetta = Repository
+                    .Query<EtichettaPersonalizzata>(verificaEtichetta, ArticoloSelezionato.CodiceArticolo)
+                    .SingleOrDefault();
+
+                if (etichetta == null)
+                {
+                    etichetta = new EtichettaPersonalizzata();
+                }
+
+                etichetta.CodiceArticolo = ArticoloSelezionato.CodiceArticolo;
+                etichetta.CodiceLayout = EtichettaSelezionata.CodiceLayout;
+
+                if (etichetta.Id == 0)
+                {
+                    Repository.Insert(etichetta);
+                }
+                else
+                {
+                    Repository.Update(etichetta);
+                }
+
+                continua = true;
+            }
+            catch (Exception ex)
+            {
+                continua = false;
+
+                Log.Error(ex.ToString());
+            }
+
+            return (etichetta, continua);
+        }
+
+        internal void SalvaEtichettaTesto(EtichettaTesto testoSelezionato)
+        {
+            try
+            {
+                if (testoSelezionato.Id == 0)
+                {
+                    Repository.Insert(testoSelezionato);
+                }
+                else
+                {
+                    Repository.Update(testoSelezionato);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+        }
+
+        internal void CancellaEtichettaTesto(EtichettaTesto testoSelezionato)
+        {
+            string deleteEtichettaTesto = "DELETE FROM EtichetteTesti WHERE Id=@0";
+            string deleteEitchettaTestoPers = "DELETE FROM EtichetteTestiPersonalizzati WHERE IdTesto=@0";
+
+            try
+            {
+                Repository.StartConversation();
+
+                Repository.Execute(deleteEtichettaTesto, testoSelezionato.Id);
+                Repository.Execute(deleteEitchettaTestoPers, testoSelezionato.Id);
+
+                Repository.StopConversation();
+            }
+            catch (Exception ex)
+            {
+                Repository.AbortConversation();
+                Log.Error(ex.ToString());
+            }
+
+        }
+
+        internal bool VerificaEsistenzaTesto(int idTesto, int tipoTesto)
+        {
+            bool result = false;
+
+            if (tipoTesto == 1)
+            {
+                result = Testi1.Where(c => c.Id == idTesto).Any();
+            }
+
+            if (tipoTesto == 2)
+            {
+                result = Testi2.Where(c => c.Id == idTesto).Any();
+            }
+
+            return result;
+        }
+
+        internal void SetEtichetta(EtichettaPersonalizzata etichetta)
+        {
+            EtichettaSelezionata = etichetta;
         }
     }
 }

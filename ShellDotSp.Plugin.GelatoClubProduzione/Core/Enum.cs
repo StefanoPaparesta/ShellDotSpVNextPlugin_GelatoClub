@@ -7,7 +7,9 @@
         StatoLineaAggiornato,
         ArticoloSelezionato,
         LottoCalcolato,
-        DataScadenzaCalcolata
+        DataScadenzaCalcolata,
+        TestiInizializzati,
+        EtichettaInizializzata
     }
 
     public enum CalcoloScadenza

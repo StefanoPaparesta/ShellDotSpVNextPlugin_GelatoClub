@@ -31,6 +31,9 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Model
         public DateTime DataScadenza { get; set; }
         public string Lotto { get; set; }
         public string CodiceBarcode { get; set; }
+
+        public string Descrizione1 { get; set; }
+        public string Descrizione2 { get; set; }
     }
     public class ReportDataCollection : BindingList<ReportData> { }
 }

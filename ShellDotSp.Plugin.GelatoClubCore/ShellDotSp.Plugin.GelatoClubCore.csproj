@@ -50,8 +50,12 @@
     <Compile Include="Config\CfgPlugin.cs" />
     <Compile Include="Helpers\ReportDataMapper.cs" />
     <Compile Include="Helpers\ReturnValue.cs" />
+    <Compile Include="Model\Etichetta.cs" />
     <Compile Include="Model\EtichettaPersonalizzata.cs" />
+    <Compile Include="Model\EtichettaTesto.cs" />
+    <Compile Include="Model\EtichettaTestoPersonalizzata.cs" />
     <Compile Include="Model\LookUpData.cs" />
+    <Compile Include="Model\LookUpdataTesto.cs" />
     <Compile Include="Model\ReportData.cs" />
     <Compile Include="Model\StatoLinea.cs" />
     <Compile Include="Model\TabellaLookUp.cs" />
