@@ -79,6 +79,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
             lkEtichette.Enabled = false;
             btnManageDesc1.Enabled = false;
             btnManageDesc2.Enabled = false;
+            btnImportaTesti.Enabled = false;
         }
 
         public void UpdateUI(MessaggioPlugin messaggio)
@@ -147,9 +148,14 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
             lkEtichette.EditValue = null;
             lkEtichette.Enabled = _presenter.ArticoloSelezionato != null;
 
+            lkDescrizione1.EditValue = null;
+            lkDescrizione2.EditValue = null;
+
             if (_presenter.ArticoloSelezionato != null)
             {
                 lblArticolo.Text = $"{_presenter.ArticoloSelezionato.CodiceArticolo} - {_presenter.ArticoloSelezionato.DescrizioneArticolo}";
+
+                lblTitoloArticolo.Text = $"ARTICOLO [{_presenter.ArticoloSelezionato.CodiceArticolo}]";
 
                 lblDescCommerciale.Text = _presenter.ArticoloSelezionato.DescrCommercialeITA;
                 lblDescLegaleITA.Text = _presenter.ArticoloSelezionato.DescrLegaleITA;
@@ -198,6 +204,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
             else
             {
                 lblArticolo.Text = string.Empty;
+                lblTitoloArticolo.Text = $"ARTICOLO";
 
                 lblDescCommerciale.Text = string.Empty;
                 lblDescLegaleITA.Text = string.Empty;
@@ -216,6 +223,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 lkDescrizione2.Enabled = _presenter.ArticoloSelezionato != null;
                 btnManageDesc1.Enabled = _presenter.ArticoloSelezionato != null;
                 btnManageDesc2.Enabled = _presenter.ArticoloSelezionato != null;
+                btnImportaTesti.Enabled = _presenter.ArticoloSelezionato != null;
 
                 lkDescrizione1.EditValue = null;
                 lkDescrizione2.EditValue = null;
@@ -241,6 +249,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
             lkDescrizione2.Enabled = _presenter.ArticoloSelezionato != null;
             btnManageDesc1.Enabled = _presenter.ArticoloSelezionato != null;
             btnManageDesc2.Enabled = _presenter.ArticoloSelezionato != null;
+            btnImportaTesti.Enabled = _presenter.ArticoloSelezionato != null;
 
             bndDescrizione1.DataSource = _presenter.Testi1;
             bndDescrizione2.DataSource = _presenter.Testi2;
@@ -401,5 +410,34 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 _etichettaSelFromPresenter = false;
             }
         }
+
+        private void btnImportTesti_Click(object sender, EventArgs e)
+        {
+            var question = _msg.Question("Vuoi importare i testi da un altro articolo ?");
+
+            if (question == DialogResult.Yes)
+            {
+                using (var frm = new FrmArticoli(_presenter))
+                {
+                    if (frm.ShowDialog() == DialogResult.OK)
+                    {
+                        try
+                        {
+                            _presenter.ImnportaTestiDaArticolo(frm.ArticoloSelezionato);
+
+                            _msg.Info($"Testi importati correttamente dall'articolo {frm.ArticoloSelezionato.CodiceArticolo}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex.ToString());
+                            _msg.Error(ex.Message);
+                        }
+                    }
+                }
+            }
+
+        }
+
+
     }
 }

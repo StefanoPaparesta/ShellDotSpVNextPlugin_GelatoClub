@@ -681,5 +681,13 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         {
             EtichettaSelezionata = etichetta;
         }
+
+        internal void ImnportaTestiDaArticolo(VArticoloGestionale articoloProvenienza)
+        {
+            string sql = "EXEC stp_importa_testi_personalizzati @0,@1";
+            Repository.Execute(sql, articoloProvenienza.CodiceArticolo, ArticoloSelezionato.CodiceArticolo);
+
+            GetTesti();
+        }
     }
 }

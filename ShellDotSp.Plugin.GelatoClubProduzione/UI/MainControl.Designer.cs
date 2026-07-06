@@ -33,8 +33,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainControlGelatoClubProduzione));
             this.lkLinee = new DevExpress.XtraEditors.LookUpEdit();
+            this.bndLinee = new System.Windows.Forms.BindingSource(this.components);
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
+            this.lblTitoloArticolo = new DevExpress.XtraEditors.LabelControl();
             this.lblArticolo = new DevExpress.XtraEditors.LabelControl();
             this.btnInvia = new DevExpress.XtraEditors.SimpleButton();
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
@@ -69,35 +70,35 @@
             this.labelControl17 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl19 = new DevExpress.XtraEditors.LabelControl();
             this.lkDescrizione1 = new DevExpress.XtraEditors.LookUpEdit();
+            this.bndDescrizione1 = new System.Windows.Forms.BindingSource(this.components);
             this.lkDescrizione2 = new DevExpress.XtraEditors.LookUpEdit();
+            this.bndDescrizione2 = new System.Windows.Forms.BindingSource(this.components);
             this.btnManageDesc1 = new DevExpress.XtraEditors.SimpleButton();
             this.btnManageDesc2 = new DevExpress.XtraEditors.SimpleButton();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnImportaTesti = new DevExpress.XtraEditors.SimpleButton();
+            this.labelControl18 = new DevExpress.XtraEditors.LabelControl();
+            this.lkEtichette = new DevExpress.XtraEditors.LookUpEdit();
+            this.bndEtichette = new System.Windows.Forms.BindingSource(this.components);
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.bndEtichette = new System.Windows.Forms.BindingSource(this.components);
-            this.bndDescrizione1 = new System.Windows.Forms.BindingSource(this.components);
-            this.bndDescrizione2 = new System.Windows.Forms.BindingSource(this.components);
-            this.bndLinee = new System.Windows.Forms.BindingSource(this.components);
-            this.lkEtichette = new DevExpress.XtraEditors.LookUpEdit();
-            this.labelControl18 = new DevExpress.XtraEditors.LabelControl();
             ((System.ComponentModel.ISupportInitialize)(this.lkLinee.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione2.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).BeginInit();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.lkEtichette.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lkEtichette.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // lkLinee
@@ -123,6 +124,10 @@
             this.lkLinee.TabIndex = 0;
             this.lkLinee.EditValueChanged += new System.EventHandler(this.lkLinee_EditValueChanged);
             // 
+            // bndLinee
+            // 
+            this.bndLinee.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.LookUpDataCollection);
+            // 
             // labelControl1
             // 
             this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -133,15 +138,15 @@
             this.labelControl1.TabIndex = 1;
             this.labelControl1.Text = "LINEA";
             // 
-            // labelControl2
+            // lblTitoloArticolo
             // 
-            this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelControl2.Appearance.Options.UseFont = true;
-            this.labelControl2.Location = new System.Drawing.Point(340, 70);
-            this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(58, 14);
-            this.labelControl2.TabIndex = 2;
-            this.labelControl2.Text = "ARTICOLO";
+            this.lblTitoloArticolo.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitoloArticolo.Appearance.Options.UseFont = true;
+            this.lblTitoloArticolo.Location = new System.Drawing.Point(340, 70);
+            this.lblTitoloArticolo.Name = "lblTitoloArticolo";
+            this.lblTitoloArticolo.Size = new System.Drawing.Size(58, 14);
+            this.lblTitoloArticolo.TabIndex = 2;
+            this.lblTitoloArticolo.Text = "ARTICOLO";
             // 
             // lblArticolo
             // 
@@ -155,7 +160,7 @@
             this.lblArticolo.Location = new System.Drawing.Point(339, 90);
             this.lblArticolo.Name = "lblArticolo";
             this.lblArticolo.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblArticolo.Size = new System.Drawing.Size(892, 30);
+            this.lblArticolo.Size = new System.Drawing.Size(841, 30);
             this.lblArticolo.TabIndex = 3;
             this.lblArticolo.Click += new System.EventHandler(this.lblArticolo_Click);
             // 
@@ -591,6 +596,10 @@
             this.lkDescrizione1.TabIndex = 52;
             this.lkDescrizione1.EditValueChanged += new System.EventHandler(this.lkDescrizione1_EditValueChanged);
             // 
+            // bndDescrizione1
+            // 
+            this.bndDescrizione1.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
+            // 
             // lkDescrizione2
             // 
             this.lkDescrizione2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -616,6 +625,10 @@
             this.lkDescrizione2.TabIndex = 53;
             this.lkDescrizione2.EditValueChanged += new System.EventHandler(this.lkDescrizione2_EditValueChanged);
             // 
+            // bndDescrizione2
+            // 
+            this.bndDescrizione2.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
+            // 
             // btnManageDesc1
             // 
             this.btnManageDesc1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -639,12 +652,13 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnImportaTesti);
             this.panel1.Controls.Add(this.labelControl18);
             this.panel1.Controls.Add(this.lkEtichette);
             this.panel1.Controls.Add(this.lblArticolo);
             this.panel1.Controls.Add(this.lkLinee);
             this.panel1.Controls.Add(this.labelControl1);
-            this.panel1.Controls.Add(this.labelControl2);
+            this.panel1.Controls.Add(this.lblTitoloArticolo);
             this.panel1.Controls.Add(this.labelControl3);
             this.panel1.Controls.Add(this.txDataConfezionamento);
             this.panel1.Controls.Add(this.labelControl4);
@@ -656,6 +670,56 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1234, 139);
             this.panel1.TabIndex = 56;
+            // 
+            // btnImportaTesti
+            // 
+            this.btnImportaTesti.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnImportaTesti.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.btnImportaTesti.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnImportaTesti.ImageOptions.SvgImage")));
+            this.btnImportaTesti.Location = new System.Drawing.Point(1186, 75);
+            this.btnImportaTesti.Name = "btnImportaTesti";
+            this.btnImportaTesti.Size = new System.Drawing.Size(45, 45);
+            this.btnImportaTesti.TabIndex = 55;
+            this.btnImportaTesti.Click += new System.EventHandler(this.btnImportTesti_Click);
+            // 
+            // labelControl18
+            // 
+            this.labelControl18.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelControl18.Appearance.Options.UseFont = true;
+            this.labelControl18.Location = new System.Drawing.Point(900, 13);
+            this.labelControl18.Name = "labelControl18";
+            this.labelControl18.Size = new System.Drawing.Size(116, 14);
+            this.labelControl18.TabIndex = 56;
+            this.labelControl18.Text = "LAYOUT ETICHETTA";
+            // 
+            // lkEtichette
+            // 
+            this.lkEtichette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lkEtichette.Location = new System.Drawing.Point(896, 33);
+            this.lkEtichette.Name = "lkEtichette";
+            this.lkEtichette.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lkEtichette.Properties.Appearance.Options.UseFont = true;
+            this.lkEtichette.Properties.AppearanceDropDown.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lkEtichette.Properties.AppearanceDropDown.Options.UseFont = true;
+            this.lkEtichette.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.lkEtichette.Properties.Columns.AddRange(new DevExpress.XtraEditors.Controls.LookUpColumnInfo[] {
+            new DevExpress.XtraEditors.Controls.LookUpColumnInfo("Codice", "Codice", 5, DevExpress.Utils.FormatType.None, "", true, DevExpress.Utils.HorzAlignment.Near, DevExpress.Data.ColumnSortOrder.None, DevExpress.Utils.DefaultBoolean.Default)});
+            this.lkEtichette.Properties.DataSource = this.bndEtichette;
+            this.lkEtichette.Properties.DisplayMember = "Codice";
+            this.lkEtichette.Properties.NullText = "<seleziona l\'etichetta>";
+            this.lkEtichette.Properties.ShowFooter = false;
+            this.lkEtichette.Properties.ShowHeader = false;
+            this.lkEtichette.Properties.ShowLines = false;
+            this.lkEtichette.Properties.ValueMember = "Codice";
+            this.lkEtichette.Size = new System.Drawing.Size(335, 30);
+            this.lkEtichette.TabIndex = 55;
+            this.lkEtichette.EditValueChanged += new System.EventHandler(this.lkEtichette_EditValueChanged);
+            // 
+            // bndEtichette
+            // 
+            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaCollection);
             // 
             // tableLayoutPanel1
             // 
@@ -728,57 +792,6 @@
             this.panel4.Size = new System.Drawing.Size(1234, 85);
             this.panel4.TabIndex = 58;
             // 
-            // bndEtichette
-            // 
-            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaCollection);
-            // 
-            // bndDescrizione1
-            // 
-            this.bndDescrizione1.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
-            // 
-            // bndDescrizione2
-            // 
-            this.bndDescrizione2.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
-            // 
-            // bndLinee
-            // 
-            this.bndLinee.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.LookUpDataCollection);
-            // 
-            // lkEtichette
-            // 
-            this.lkEtichette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lkEtichette.Location = new System.Drawing.Point(896, 33);
-            this.lkEtichette.Name = "lkEtichette";
-            this.lkEtichette.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lkEtichette.Properties.Appearance.Options.UseFont = true;
-            this.lkEtichette.Properties.AppearanceDropDown.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lkEtichette.Properties.AppearanceDropDown.Options.UseFont = true;
-            this.lkEtichette.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.lkEtichette.Properties.Columns.AddRange(new DevExpress.XtraEditors.Controls.LookUpColumnInfo[] {
-            new DevExpress.XtraEditors.Controls.LookUpColumnInfo("Codice", "Codice", 5, DevExpress.Utils.FormatType.None, "", true, DevExpress.Utils.HorzAlignment.Near, DevExpress.Data.ColumnSortOrder.None, DevExpress.Utils.DefaultBoolean.Default)});
-            this.lkEtichette.Properties.DataSource = this.bndEtichette;
-            this.lkEtichette.Properties.DisplayMember = "Codice";
-            this.lkEtichette.Properties.NullText = "<seleziona l\'etichetta>";
-            this.lkEtichette.Properties.ShowFooter = false;
-            this.lkEtichette.Properties.ShowHeader = false;
-            this.lkEtichette.Properties.ShowLines = false;
-            this.lkEtichette.Properties.ValueMember = "Codice";
-            this.lkEtichette.Size = new System.Drawing.Size(335, 30);
-            this.lkEtichette.TabIndex = 55;
-            this.lkEtichette.EditValueChanged += new System.EventHandler(this.lkEtichette_EditValueChanged);
-            // 
-            // labelControl18
-            // 
-            this.labelControl18.Appearance.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelControl18.Appearance.Options.UseFont = true;
-            this.labelControl18.Location = new System.Drawing.Point(900, 13);
-            this.labelControl18.Name = "labelControl18";
-            this.labelControl18.Size = new System.Drawing.Size(116, 14);
-            this.labelControl18.TabIndex = 56;
-            this.labelControl18.Text = "LAYOUT ETICHETTA";
-            // 
             // MainControlGelatoClubProduzione
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -790,23 +803,23 @@
             this.Name = "MainControlGelatoClubProduzione";
             this.Size = new System.Drawing.Size(1234, 626);
             ((System.ComponentModel.ISupportInitialize)(this.lkLinee.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties.CalendarTimeProperties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione2.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.lkEtichette.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.panel4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lkEtichette.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -816,7 +829,7 @@
         private System.Windows.Forms.BindingSource bndLinee;
         private DevExpress.XtraEditors.LookUpEdit lkLinee;
         private DevExpress.XtraEditors.LabelControl labelControl1;
-        private DevExpress.XtraEditors.LabelControl labelControl2;
+        private DevExpress.XtraEditors.LabelControl lblTitoloArticolo;
         private DevExpress.XtraEditors.LabelControl lblArticolo;
         private DevExpress.XtraEditors.SimpleButton btnInvia;
         private DevExpress.XtraEditors.LabelControl labelControl3;
@@ -864,5 +877,6 @@
         private System.Windows.Forms.BindingSource bndEtichette;
         private DevExpress.XtraEditors.LabelControl labelControl18;
         private DevExpress.XtraEditors.LookUpEdit lkEtichette;
+        private DevExpress.XtraEditors.SimpleButton btnImportaTesti;
     }
 }
