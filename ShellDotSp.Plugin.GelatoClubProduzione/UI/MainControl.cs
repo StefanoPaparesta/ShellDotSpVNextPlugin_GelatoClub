@@ -256,7 +256,11 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
         }
         private void EtichettaInizializzata()
         {
-            _etichettaSelFromPresenter = true;
+            if (_presenter.EtichettaSelezionata != null)
+            {
+                _etichettaSelFromPresenter = true;
+            }
+
             lkEtichette.EditValue = _presenter.EtichettaSelezionata?.CodiceLayout ?? null;
         }
 
