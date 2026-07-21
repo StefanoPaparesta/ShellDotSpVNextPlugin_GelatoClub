@@ -76,6 +76,7 @@
             this.btnManageDesc1 = new DevExpress.XtraEditors.SimpleButton();
             this.btnManageDesc2 = new DevExpress.XtraEditors.SimpleButton();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnDataManuale = new DevExpress.XtraEditors.SimpleButton();
             this.btnImportaTesti = new DevExpress.XtraEditors.SimpleButton();
             this.labelControl18 = new DevExpress.XtraEditors.LabelControl();
             this.lkEtichette = new DevExpress.XtraEditors.LookUpEdit();
@@ -190,7 +191,7 @@
             // txDataConfezionamento
             // 
             this.txDataConfezionamento.EditValue = null;
-            this.txDataConfezionamento.Location = new System.Drawing.Point(6, 34);
+            this.txDataConfezionamento.Location = new System.Drawing.Point(6, 33);
             this.txDataConfezionamento.Name = "txDataConfezionamento";
             this.txDataConfezionamento.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txDataConfezionamento.Properties.Appearance.Options.UseFont = true;
@@ -200,7 +201,7 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.txDataConfezionamento.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.txDataConfezionamento.Size = new System.Drawing.Size(327, 30);
+            this.txDataConfezionamento.Size = new System.Drawing.Size(263, 30);
             this.txDataConfezionamento.TabIndex = 22;
             this.txDataConfezionamento.EditValueChanged += new System.EventHandler(this.txDataConfezionamento_EditValueChanged);
             // 
@@ -230,7 +231,7 @@
             this.lblLotto.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
             this.lblLotto.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
             this.lblLotto.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.lblLotto.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblLotto.Cursor = System.Windows.Forms.Cursors.Default;
             this.lblLotto.Location = new System.Drawing.Point(340, 33);
             this.lblLotto.Name = "lblLotto";
             this.lblLotto.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
@@ -652,6 +653,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnDataManuale);
             this.panel1.Controls.Add(this.btnImportaTesti);
             this.panel1.Controls.Add(this.labelControl18);
             this.panel1.Controls.Add(this.lkEtichette);
@@ -670,6 +672,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1234, 139);
             this.panel1.TabIndex = 56;
+            // 
+            // btnDataManuale
+            // 
+            this.btnDataManuale.Location = new System.Drawing.Point(272, 33);
+            this.btnDataManuale.Name = "btnDataManuale";
+            this.btnDataManuale.Size = new System.Drawing.Size(64, 30);
+            this.btnDataManuale.TabIndex = 57;
+            this.btnDataManuale.Tag = "AUTO";
+            this.btnDataManuale.Text = "DT.AUTO";
+            this.btnDataManuale.Click += new System.EventHandler(this.btnDataManuale_Click);
             // 
             // btnImportaTesti
             // 
@@ -878,5 +890,6 @@
         private DevExpress.XtraEditors.LabelControl labelControl18;
         private DevExpress.XtraEditors.LookUpEdit lkEtichette;
         private DevExpress.XtraEditors.SimpleButton btnImportaTesti;
+        private DevExpress.XtraEditors.SimpleButton btnDataManuale;
     }
 }

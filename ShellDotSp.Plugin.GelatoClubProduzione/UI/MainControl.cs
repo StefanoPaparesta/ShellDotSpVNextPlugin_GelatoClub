@@ -35,7 +35,6 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
         }
 
         public string Caption { get; set; }
-        public bool IsLottoManuale { get; set; } = false;
 
         private event EventHandler viewInitialized;
         private event EventHandler closeView;
@@ -241,7 +240,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
         private void DataScadenzaCalcolata()
         {
             lblDataScadenza.Text = _presenter.DataScadenza.ToString("dd/MM/yyyy");
-            _logger.Info("DATA SCADENZA CALCOLATA {dt:dd/MM/yyyy}", _presenter.DataScadenza);
+            //_logger.Info("DATA SCADENZA CALCOLATA {dt:dd/MM/yyyy}", _presenter.DataScadenza);
         }
         private void TestiInizializzati()
         {
@@ -320,7 +319,9 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 if (txDataConfezionamento.DateTime != now)
                 {
                     txDataConfezionamento.DateTime = now;
+
                     _presenter.SetDataConfezionamento(now);
+
                     _logger.Info("CAMBIO DATA CONFEZIONAMENTO");
                 }
             }
@@ -329,15 +330,8 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 _logger.Info("DATA CONFEZIONAMENTO MANUALE {dt}", txDataConfezionamento.DateTime);
             }
 
+            _presenter.CalcolaLotto();
 
-            if (!IsLottoManuale)
-            {
-                _presenter.CalcolaLotto();
-            }
-            if (IsLottoManuale)
-            {
-                _logger.Info("NO CALCOLA LOTTO => E' inserito un lotto manuale");
-            }
         }
 
         private void txDataConfezionamento_EditValueChanged(object sender, EventArgs e)
@@ -442,6 +436,27 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
 
         }
 
+        private void btnDataManuale_Click(object sender, EventArgs e)
+        {
+            if (btnDataManuale.Tag.ToString() == "AUTO")
+            {
+                btnDataManuale.Text = "DT.MAN";
+                btnDataManuale.Tag = "MAN";
 
+                txDataConfezionamento.Enabled = true;
+                txDataConfezionamento.BackColor = Color.Red;
+                _dataConfezionamentoManuale = true;
+            }
+            else
+            {
+                btnDataManuale.Text = "DT.AUTO";
+                btnDataManuale.Tag = "AUTO";
+
+                txDataConfezionamento.Enabled = false;
+                txDataConfezionamento.DateTime = DateTime.Today;
+                txDataConfezionamento.BackColor = Color.White;
+                _dataConfezionamentoManuale = false;
+            }
+        }
     }
 }

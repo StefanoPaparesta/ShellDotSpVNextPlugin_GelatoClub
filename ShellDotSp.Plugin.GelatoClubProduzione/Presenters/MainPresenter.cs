@@ -336,6 +336,11 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
 
         internal void CalcolaLotto()
         {
+            if (ArticoloSelezionato != null)
+            {
+                CalcoloDataScadenza(CalcoloScadenza.Mesi, ArticoloSelezionato.MesiValiditaLotto, ArticoloSelezionato.ScadenzaAFineMese == "S");
+            }
+
             Lotto = $"{DataConfezionamento.DayOfYear:000}";
             View.UpdateUI(MessaggioPlugin.LottoCalcolato);
         }
