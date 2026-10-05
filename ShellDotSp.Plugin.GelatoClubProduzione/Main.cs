@@ -43,7 +43,7 @@ namespace ShellDotSp.Plugin.DePetrisPacchi
         {
             get
             {
-                return global::ShellDotSp.Plugin.GelatoClubProduzione._48x48.hand_delivery_filled;
+                return global::ShellDotSp.Plugin.GelatoClubProduzione._48x48.print_area;
             }
         }
 

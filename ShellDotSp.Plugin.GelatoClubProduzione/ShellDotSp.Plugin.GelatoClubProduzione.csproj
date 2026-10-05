@@ -295,6 +295,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\print_area.png" />
     <None Include="Properties\DataSources\ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaCollection.datasource" />
     <None Include="Properties\DataSources\ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection.datasource" />
     <None Include="Resources\tobia_logo.png" />

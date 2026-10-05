@@ -28,14 +28,14 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner
         {
             get
             {
-                return "LABEL DESIGNER";
+                return "DESIGNER ETICHETTE";
             }
         }
         public string Title
         {
             get
             {
-                return "LABEL DESIGNER";
+                return "DESIGNER ETICHETTE";
             }
         }
         public Bitmap Image

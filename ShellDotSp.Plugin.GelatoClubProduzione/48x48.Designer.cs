@@ -143,6 +143,16 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap print_area {
+            get {
+                object obj = ResourceManager.GetObject("print_area", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap RivarenoLogo {
             get {
                 object obj = ResourceManager.GetObject("RivarenoLogo", resourceCulture);
