@@ -2,6 +2,7 @@
   <Folder Name="/Plugins/">
     <Project Path="../../Standard/ModuliShell/ShellDotSp.Plugin.ShellTabelleLookup/ShellDotSp.Plugin.ShellTabelleLookup.csproj" Id="44709f62-2302-441b-84c7-1bf1e64adc5d" />
     <Project Path="ShellDotSp.Plugin.GelatoClubCore/ShellDotSp.Plugin.GelatoClubCore.csproj" Id="c0b000aa-e8e6-4dc3-b1f5-69d5eb9d6f35" />
+    <Project Path="ShellDotSp.Plugin.GelatoClubLblDesigner/ShellDotSp.Plugin.GelatoClubLblDesigner.csproj" Id="8c379574-45d5-4a44-9ede-b42bf9bd69ed" />
     <Project Path="ShellDotSp.Plugin.GelatoClubProduzione/ShellDotSp.Plugin.GelatoClubProduzione.csproj" Id="77dceb2c-d73e-439b-b0d5-d38d26f45da2" />
   </Folder>
   <Folder Name="/Shell/">
@@ -10,7 +11,9 @@
     <Project Path="../../../ShellDotSpVNext/ShellDotSp.Datalayer/ShellDotSp.Datalayer.csproj" Id="25bc70f6-f827-41fd-bdc8-6ba74739f153" />
     <Project Path="../../../ShellDotSpVNext/ShellDotSp.UI/ShellDotSp.UI.csproj" Id="9342187a-894c-4581-bcb2-27e2761ae234">
       <BuildDependency Project="../../../ShellDotSpVNext/ShellDotSp.Datalayer/ShellDotSp.Datalayer.csproj" />
+      <BuildDependency Project="../../Standard/ModuliShell/ShellDotSp.Plugin.ShellTabelleLookup/ShellDotSp.Plugin.ShellTabelleLookup.csproj" />
       <BuildDependency Project="ShellDotSp.Plugin.GelatoClubCore/ShellDotSp.Plugin.GelatoClubCore.csproj" />
+      <BuildDependency Project="ShellDotSp.Plugin.GelatoClubLblDesigner/ShellDotSp.Plugin.GelatoClubLblDesigner.csproj" />
       <BuildDependency Project="ShellDotSp.Plugin.GelatoClubProduzione/ShellDotSp.Plugin.GelatoClubProduzione.csproj" />
     </Project>
   </Folder>

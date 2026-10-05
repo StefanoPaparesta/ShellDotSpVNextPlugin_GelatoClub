@@ -1,4 +1,6 @@
-﻿namespace ShellDotSp.Plugin.GelatoClubCore.Model
+﻿using System.ComponentModel;
+
+namespace ShellDotSp.Plugin.GelatoClubCore.Model
 {
     public class TabellaLookUp
     {
@@ -14,4 +16,5 @@
         public bool ValoreBool { get; set; }
         public string Note { get; set; }
     }
+    public class TabellaLookupCollection : BindingList<TabellaLookUp> { }
 }
