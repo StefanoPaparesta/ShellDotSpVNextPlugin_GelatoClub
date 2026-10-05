@@ -131,6 +131,7 @@
       <DependentUpon>48x48.resx</DependentUpon>
     </Compile>
     <Compile Include="Core\Enum.cs" />
+    <Compile Include="Core\ReportPreviewData.cs" />
     <Compile Include="Forms\FrmClona.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -167,7 +167,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                     wait.ShowWaitForm();
                     try
                     {
-                        using (var designer = new FrmLabelDesigner(fileName, typeof(ReportDataCollection), Larghezza, Altezza))
+                        using (var designer = new FrmLabelDesigner(fileName, typeof(ReportDataCollection), Larghezza, Altezza,
+                            ReportPreviewData.Create))
                         {
                             EventHandler shown = (s, args) =>
                             {

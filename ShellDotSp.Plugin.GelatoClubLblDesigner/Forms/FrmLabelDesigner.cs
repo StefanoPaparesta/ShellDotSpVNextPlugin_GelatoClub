@@ -1,6 +1,7 @@
 ﻿using DevExpress.DataAccess.ObjectBinding;
 using DevExpress.XtraBars.Docking;
 using DevExpress.XtraEditors;
+using DevExpress.XtraReports.Design;
 using DevExpress.XtraReports.UI;
 using DevExpress.XtraReports.UserDesigner;
 
@@ -46,7 +47,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
         public event EventHandler<EtichettaSalvataEventArgs> EtichettaSalvata;
 
+        private byte[] _savedLayout;
         private readonly Type _dataSourceType;
+        private readonly Func<object> _previewDataFactory;
         private readonly int _larghezza;
         private readonly int _altezza;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -54,7 +57,6 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
         public FrmLabelDesigner()
         {
             InitializeComponent();
-
 
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReport, CommandVisibility.None);
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReportWizard, CommandVisibility.None);
@@ -71,9 +73,11 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             OpenOrCreateLabel(fileName);
         }
 
-        public FrmLabelDesigner(string fileName, Type dataSourceType, int Larghezza, int Altezza) : this()
+        public FrmLabelDesigner(string fileName, Type dataSourceType, int Larghezza, int Altezza,
+            Func<object> previewDataFactory = null) : this()
         {
             _dataSourceType = dataSourceType ?? throw new ArgumentNullException(nameof(dataSourceType));
+            _previewDataFactory = previewDataFactory;
 
             _larghezza = Larghezza;
             _altezza = Altezza;
@@ -101,6 +105,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                     reportDesigner1.ActiveDesignPanel.FileName = Path.GetFullPath(fileName);
                     reportDesigner1.ActiveDesignPanel.ReportState = nomeModificato
                         ? ReportState.Changed : ReportState.Saved;
+                    if (!nomeModificato)
+                        _savedLayout = GetLayout(reportDesigner1.ActiveDesignPanel);
                 }
                 catch
                 {
@@ -206,7 +212,14 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
         {
             ConfigureDockPanels();
             ConfigureToolbox(e.DesignerHost);
+            ((XRDesignPanel)sender).SelectedTabIndexChanged += DesignPanel_SelectedTabIndexChanged;
             ((XRDesignPanel)sender).AddCommandHandler(new SaveLabelCommandHandler(this, (XRDesignPanel)sender));
+            if (_previewDataFactory != null)
+            {
+                var tabs = ((XRDesignPanel)sender).GetService(typeof(ReportTabControl)) as ReportTabControl;
+                if (tabs != null)
+                    tabs.PreviewReportCreated += PreviewReportCreated;
+            }
             if (_dataSourceType == null)
                 return;
 
@@ -237,6 +250,58 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
             var host = (IDesignerHost)panel.GetService(typeof(IDesignerHost));
             fieldListDockPanel1.UpdateDataSource(host);
+        }
+
+        private static byte[] GetLayout(XRDesignPanel panel)
+        {
+            using (var stream = new MemoryStream())
+            {
+                panel.Report.SaveLayoutToXml(stream);
+                return stream.ToArray();
+            }
+        }
+
+        private void RestoreUnchangedReportState()
+        {
+            var panel = reportDesigner1.ActiveDesignPanel;
+            if (_savedLayout == null || panel == null || panel.Report == null ||
+                panel.ReportState != ReportState.Changed)
+                return;
+
+            if (_savedLayout.SequenceEqual(GetLayout(panel)))
+                panel.ReportState = ReportState.Saved;
+        }
+
+        private void DesignPanel_SelectedTabIndexChanged(object sender, EventArgs e)
+        {
+            var panel = (XRDesignPanel)sender;
+            if (panel.SelectedTabIndex != 0 || !IsHandleCreated)
+                return;
+
+            // Attende che il designer abbia terminato il rientro dall'anteprima.
+            BeginInvoke(new Action(() =>
+            {
+                if (!IsDisposed && !Disposing)
+                    RestoreUnchangedReportState();
+            }));
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            RestoreUnchangedReportState();
+            base.OnFormClosing(e);
+        }
+
+        private void PreviewReportCreated(object sender, EventArgs e)
+        {
+            var previewReport = ((ReportTabControl)sender).PreviewReport;
+            var data = _previewDataFactory();
+            if (data == null)
+                throw new InvalidOperationException("La sorgente dei dati di anteprima non ha restituito dati.");
+
+            // Modifica soltanto la copia di anteprima, lasciando nel REPX la sorgente basata sul tipo.
+            DevExpress.XtraReports.DataSourceManager.ReplaceDataSource(previewReport, previewReport.DataSource, data);
+            previewReport.DataMember = string.Empty;
         }
 
         private sealed class SaveLabelCommandHandler : ICommandHandler
@@ -276,6 +341,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                     Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(fileName)));
                     _panel.Report.SaveLayoutToXml(fileName);
                     _panel.FileName = fileName;
+                    _owner._savedLayout = GetLayout(_panel);
                     _panel.ReportState = ReportState.Saved;
                 }
                 catch (Exception ex)
