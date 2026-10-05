@@ -401,9 +401,9 @@
             // 
             this.xrPictureBox1.Dpi = 254F;
             this.xrPictureBox1.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource(global::ShellDotSp.Plugin.GelatoClubProduzione._48x48.RivarenoLogo, true);
-            this.xrPictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
+            this.xrPictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 60.85417F);
             this.xrPictureBox1.Name = "xrPictureBox1";
-            this.xrPictureBox1.SizeF = new System.Drawing.SizeF(358.6574F, 323.0856F);
+            this.xrPictureBox1.SizeF = new System.Drawing.SizeF(358.6574F, 219.8981F);
             this.xrPictureBox1.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
             // 
             // bindingSource1

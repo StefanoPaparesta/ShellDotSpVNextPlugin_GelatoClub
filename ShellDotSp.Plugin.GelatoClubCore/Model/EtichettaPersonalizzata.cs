@@ -9,5 +9,6 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Model
         public int Id { get; set; }
         public string CodiceLayout { get; set; }
         public string CodiceArticolo { get; set; }
+        public string CodiceLinea { get; set; }
     }
 }

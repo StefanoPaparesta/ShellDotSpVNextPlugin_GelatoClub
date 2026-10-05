@@ -29,14 +29,14 @@ namespace ShellDotSp.Plugin.DePetrisPacchi
         {
             get
             {
-                return "ETICHETTE";
+                return "STAMPA ETICHETTE";
             }
         }
         public string Title
         {
             get
             {
-                return "ETICHETTE";
+                return "STAMPA ETICHETTE";
             }
         }
         public Bitmap Image

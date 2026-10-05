@@ -230,6 +230,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
 
 
                 string sql = "SELECT * FROM dbo.TabellaLookUp WHERE Tabella=@0 AND Codice=@1";
+
                 TabellaLookUp stampante = Repository.Query<TabellaLookUp>(sql, "Stampanti", LineaSelezionata.Codice).SingleOrDefault();
 
                 Log.Info("Stampante associata alla linea: {stampante}", stampante != null ? stampante.Valore : "Nessuna");
@@ -258,7 +259,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                 reportData.Descrizione1 = testo1Stampa.DescrizioneCompleta;
                 reportData.Descrizione2 = testo2Stampa.DescrizioneCompleta;
 
-                string fileName = Path.Combine(_paths.Etichette, $"{etichettaReale.Valore}.repx");
+                string fileName = Path.Combine(_paths.Etichette, $"{etichettaReale.Codice}.repx");
 
                 if (File.Exists(fileName))
                 {
@@ -436,10 +437,10 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
 
         internal void GetEtichetta()
         {
-            string sqlGetEtichetta = "SELECT * FROM EtichettePersonalizzate WHERE CodiceArticolo=@0";
+            string sqlGetEtichetta = "SELECT * FROM EtichettePersonalizzate WHERE CodiceArticolo=@0 AND CodiceLinea=@1";
 
             EtichettaSelezionata = Repository
-                .Query<EtichettaPersonalizzata>(sqlGetEtichetta, ArticoloSelezionato.CodiceArticolo)
+                .Query<EtichettaPersonalizzata>(sqlGetEtichetta, ArticoloSelezionato.CodiceArticolo, LineaSelezionata.Codice)
                 .SingleOrDefault();
 
             View.UpdateUI(MessaggioPlugin.EtichettaInizializzata);
@@ -589,10 +590,10 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
 
             try
             {
-                string verificaEtichetta = "SELECT * FROM EtichettePersonalizzate WHERE CodiceArticolo=@0";
+                string verificaEtichetta = "SELECT * FROM EtichettePersonalizzate WHERE CodiceArticolo=@0 AND CodiceLinea=@1";
 
                 etichetta = Repository
-                    .Query<EtichettaPersonalizzata>(verificaEtichetta, ArticoloSelezionato.CodiceArticolo)
+                    .Query<EtichettaPersonalizzata>(verificaEtichetta, ArticoloSelezionato.CodiceArticolo, LineaSelezionata.Codice)
                     .SingleOrDefault();
 
                 if (etichetta == null)
@@ -602,6 +603,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
 
                 etichetta.CodiceArticolo = ArticoloSelezionato.CodiceArticolo;
                 etichetta.CodiceLayout = EtichettaSelezionata.CodiceLayout;
+                etichetta.CodiceLinea = LineaSelezionata.Codice;
 
                 if (etichetta.Id == 0)
                 {
