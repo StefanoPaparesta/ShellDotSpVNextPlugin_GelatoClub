@@ -51,7 +51,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 240);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(418, 72);
+            this.panel1.Size = new System.Drawing.Size(429, 72);
             this.panel1.TabIndex = 2;
             // 
             // btnConferma
@@ -141,7 +141,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(418, 312);
+            this.ClientSize = new System.Drawing.Size(429, 312);
             this.Controls.Add(this.txNote);
             this.Controls.Add(this.labelControl3);
             this.Controls.Add(this.txStrutturaGs1);
@@ -149,6 +149,7 @@
             this.Controls.Add(this.txCodice);
             this.Controls.Add(this.labelControl1);
             this.Controls.Add(this.panel1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FrmEtichetta";

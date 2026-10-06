@@ -297,17 +297,17 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
 
                 if (frm.ShowDialog() == DialogResult.OK)
                 {
-
                     try
                     {
-                        _presenter.ClonaEtichetta(frm.CodicePrecedente, frm.CodiceNuovo);
+                        _presenter.ClonaEtichetta(frm.CodicePrecedente,
+                            frm.CodiceNuovo,
+                            _presenter.EtichettaSelezionata.Note);
                     }
                     catch (Exception ex)
                     {
                         _msg.Error(ex.Message);
                     }
                 }
-
 
                 _presenter.LoadEtichette();
                 _presenter.SetEtichetta(null);

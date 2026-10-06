@@ -120,6 +120,7 @@
             this.Controls.Add(this.lkFormati);
             this.Controls.Add(this.labelControl1);
             this.Controls.Add(this.panel1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FrmFormatiEtichetta";

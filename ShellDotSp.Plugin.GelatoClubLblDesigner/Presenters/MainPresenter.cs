@@ -139,7 +139,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             return Repository.Query<TabellaLookUp>(sql, "FormatiEtichette").ToList();
         }
 
-        internal void ClonaEtichetta(string codicePrecente, string codiceNuovo)
+        internal void ClonaEtichetta(string codicePrecente, string codiceNuovo, string note)
         {
             try
             {
@@ -151,7 +151,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
                     Codice = codiceNuovo,
                     Valore = codiceNuovo,
                     CodiceNumerico = 1,
-                    ValoreStr1 = EtichettaSelezionata.ValoreStr1
+                    ValoreStr1 = EtichettaSelezionata.ValoreStr1,
+                    Note = note,
                 };
 
                 Repository.Insert(etichetta);

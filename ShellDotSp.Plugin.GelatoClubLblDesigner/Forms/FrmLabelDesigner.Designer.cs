@@ -1295,7 +1295,7 @@
             this.propertyGridDockPanel1.ID = new System.Guid("b38d12c3-cd06-4dec-b93d-63a0088e495a");
             this.propertyGridDockPanel1.Location = new System.Drawing.Point(1, 23);
             this.propertyGridDockPanel1.Name = "propertyGridDockPanel1";
-            this.propertyGridDockPanel1.OriginalSize = new System.Drawing.Size(374, 242);
+            this.propertyGridDockPanel1.OriginalSize = new System.Drawing.Size(374, 511);
             this.propertyGridDockPanel1.Size = new System.Drawing.Size(374, 511);
             this.propertyGridDockPanel1.Text = "Properties";
             // 
@@ -1313,7 +1313,7 @@
             this.fieldListDockPanel1.ID = new System.Guid("faf69838-a93f-4114-83e8-d0d09cc5ce95");
             this.fieldListDockPanel1.Location = new System.Drawing.Point(1, 23);
             this.fieldListDockPanel1.Name = "fieldListDockPanel1";
-            this.fieldListDockPanel1.OriginalSize = new System.Drawing.Size(374, 243);
+            this.fieldListDockPanel1.OriginalSize = new System.Drawing.Size(374, 511);
             this.fieldListDockPanel1.Size = new System.Drawing.Size(374, 511);
             this.fieldListDockPanel1.Text = "Field List";
             // 
@@ -1410,8 +1410,8 @@
             // 
             // FrmLabelDesigner
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1042, 679);
             this.Controls.Add(this.panelContainer1);
             this.Controls.Add(this.hideContainerBottom);

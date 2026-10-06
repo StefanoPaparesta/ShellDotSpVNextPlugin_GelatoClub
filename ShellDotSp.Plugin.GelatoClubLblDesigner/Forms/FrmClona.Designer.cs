@@ -121,14 +121,15 @@
             // 
             // FrmClona
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(418, 312);
             this.Controls.Add(this.txCodicePrecedente);
             this.Controls.Add(this.labelControl2);
             this.Controls.Add(this.txCodiceNuovo);
             this.Controls.Add(this.labelControl1);
             this.Controls.Add(this.panel1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FrmClona";
