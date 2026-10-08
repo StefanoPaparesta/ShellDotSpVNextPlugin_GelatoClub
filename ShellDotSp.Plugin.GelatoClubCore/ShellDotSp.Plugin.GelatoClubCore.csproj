@@ -57,6 +57,7 @@
     <Compile Include="Model\LookUpData.cs" />
     <Compile Include="Model\LookUpdataTesto.cs" />
     <Compile Include="Model\ReportData.cs" />
+    <Compile Include="Model\RepositoryEtichetta.cs" />
     <Compile Include="Model\StatoLinea.cs" />
     <Compile Include="Model\TabellaLookUp.cs" />
     <Compile Include="Model\VArticoloGestionale.cs" />
