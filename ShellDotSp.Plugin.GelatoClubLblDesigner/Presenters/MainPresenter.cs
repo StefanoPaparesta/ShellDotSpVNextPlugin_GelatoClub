@@ -1,4 +1,4 @@
-﻿using ShellDotSp.Core.Base;
+using ShellDotSp.Core.Base;
 using ShellDotSp.Core.Model;
 using ShellDotSp.Plugin.GelatoClubCore.Config;
 using ShellDotSp.Plugin.GelatoClubCore.Model;
@@ -15,8 +15,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
     public class MainPresenter : Presenter<IMainView>
     {
 
-        public List<TabellaLookUp> Etichette { get; set; } = new List<TabellaLookUp>();
-        public TabellaLookUp EtichettaSelezionata { get; set; }
+        public List<RepositoryEtichetta> Etichette { get; set; } = new List<RepositoryEtichetta>();
+        public RepositoryEtichetta EtichettaSelezionata { get; set; }
         private CfgPlugin _cfg = CfgPlugin.Instance;
         private readonly ApplicationPaths _paths = ApplicationPaths.Instance;
 
@@ -41,10 +41,63 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
 
         public void LoadEtichette()
         {
-            string sql = "SELECT * FROM TabellaLookUp WHERE Tabella=@0 ORDER BY Id";
-            Etichette = Repository.Query<TabellaLookUp>(sql, "Etichette").ToList();
+            string sql = "SELECT * FROM RepositoryEtichette ORDER BY Id";
+            Etichette = Repository.Query<RepositoryEtichetta>(sql).ToList();
 
             View.UpdateUI(MessaggioPlugin.EtichetteCaricate);
+        }
+
+        // Importazione temporanea dei layout esistenti; non modifica i file originali.
+        public int ImportaEtichetteDaFile()
+        {
+            if (string.IsNullOrWhiteSpace(_cfg.RepositoryEtichette))
+                throw new InvalidOperationException("Il repository delle etichette non è configurato.");
+
+            if (!Directory.Exists(_cfg.RepositoryEtichette))
+                throw new DirectoryNotFoundException("La cartella del repository delle etichette non esiste: " + _cfg.RepositoryEtichette);
+
+            var files = Directory.GetFiles(_cfg.RepositoryEtichette, "*", SearchOption.TopDirectoryOnly)
+                .Where(file => string.Equals(Path.GetExtension(file), ".repx", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(file => file, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            int importate = 0;
+
+            Repository.StartConversation();
+            try
+            {
+                var codiciEsistenti = new HashSet<string>(
+                    Repository.Query<RepositoryEtichetta>("SELECT Codice FROM RepositoryEtichette")
+                        .Select(etichetta => etichetta.Codice),
+                    StringComparer.OrdinalIgnoreCase);
+
+                foreach (string file in files)
+                {
+                    string codice = Path.GetFileNameWithoutExtension(file);
+                    if (codiciEsistenti.Contains(codice))
+                        continue;
+
+                    Repository.Insert(new RepositoryEtichetta
+                    {
+                        Codice = codice,
+                        Descrizione = codice,
+                        StrutturaGs1 = "01-15-37#-10",
+                        Versione = 1,
+                        Layout = File.ReadAllBytes(file)
+                    });
+                    codiciEsistenti.Add(codice);
+                    importate++;
+                }
+
+                Repository.StopConversation();
+            }
+            catch
+            {
+                Repository.AbortConversation();
+                throw;
+            }
+
+            LoadEtichette();
+            return importate;
         }
 
         internal string GetFileEtichettaSelezionata()
@@ -79,14 +132,14 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             File.Copy(sourcePath, destinationPath, overwrite: true);
         }
 
-        internal void SetEtichetta(TabellaLookUp etichetta)
+        internal void SetEtichetta(RepositoryEtichetta etichetta)
         {
             EtichettaSelezionata = etichetta;
 
             View.UpdateUI(MessaggioPlugin.EtichettaSelezionata);
         }
 
-        internal void GestisciEtichetta(TabellaLookUp etichetta)
+        internal void GestisciEtichetta(RepositoryEtichetta etichetta)
         {
             if (etichetta == null)
                 throw new ArgumentNullException(nameof(etichetta));
@@ -108,7 +161,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             {
                 Repository.StartConversation();
 
-                string sql = "DELETE FROM TabellaLookUp WHERE Id=@0";
+                string sql = "DELETE FROM RepositoryEtichette WHERE Id=@0";
                 Repository.Execute(sql, EtichettaSelezionata.Id);
 
                 string fileNameRepository = Path.Combine(_cfg.RepositoryEtichette, EtichettaSelezionata.Codice + ".repx");
@@ -141,44 +194,44 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
 
         internal void ClonaEtichetta(string codicePrecente, string codiceNuovo, string note)
         {
-            try
-            {
-                Repository.StartConversation();
+            //try
+            //{
+            //    Repository.StartConversation();
 
-                TabellaLookUp etichetta = new TabellaLookUp
-                {
-                    Tabella = "Etichette",
-                    Codice = codiceNuovo,
-                    Valore = codiceNuovo,
-                    CodiceNumerico = 1,
-                    ValoreStr1 = EtichettaSelezionata.ValoreStr1,
-                    Note = note,
-                };
+            //    TabellaLookUp etichetta = new TabellaLookUp
+            //    {
+            //        Tabella = "Etichette",
+            //        Codice = codiceNuovo,
+            //        Valore = codiceNuovo,
+            //        CodiceNumerico = 1,
+            //        ValoreStr1 = EtichettaSelezionata.ValoreStr1,
+            //        Note = note,
+            //    };
 
-                Repository.Insert(etichetta);
+            //    Repository.Insert(etichetta);
 
-                string fileNameRepositoryPrec = Path.Combine(_cfg.RepositoryEtichette, EtichettaSelezionata.Codice + ".repx");
-                string fileNameLayoutPrec = Path.Combine(_paths.Etichette, EtichettaSelezionata.Codice + ".repx");
+            //    string fileNameRepositoryPrec = Path.Combine(_cfg.RepositoryEtichette, EtichettaSelezionata.Codice + ".repx");
+            //    string fileNameLayoutPrec = Path.Combine(_paths.Etichette, EtichettaSelezionata.Codice + ".repx");
 
-                string fileNameRepositoryNuovo = Path.Combine(_cfg.RepositoryEtichette, codiceNuovo + ".repx");
-                string fileNameLayoutNuovo = Path.Combine(_paths.Etichette, codiceNuovo + ".repx");
+            //    string fileNameRepositoryNuovo = Path.Combine(_cfg.RepositoryEtichette, codiceNuovo + ".repx");
+            //    string fileNameLayoutNuovo = Path.Combine(_paths.Etichette, codiceNuovo + ".repx");
 
-                if (File.Exists(fileNameRepositoryNuovo))
-                    File.Delete(fileNameRepositoryNuovo);
+            //    if (File.Exists(fileNameRepositoryNuovo))
+            //        File.Delete(fileNameRepositoryNuovo);
 
-                if (File.Exists(fileNameLayoutNuovo))
-                    File.Delete(fileNameLayoutNuovo);
+            //    if (File.Exists(fileNameLayoutNuovo))
+            //        File.Delete(fileNameLayoutNuovo);
 
-                File.Copy(fileNameRepositoryPrec, fileNameRepositoryNuovo);
-                File.Copy(fileNameLayoutPrec, fileNameLayoutNuovo);
+            //    File.Copy(fileNameRepositoryPrec, fileNameRepositoryNuovo);
+            //    File.Copy(fileNameLayoutPrec, fileNameLayoutNuovo);
 
-                Repository.StopConversation();
-            }
-            catch (Exception)
-            {
-                Repository.AbortConversation();
-                throw;
-            }
+            //    Repository.StopConversation();
+            //}
+            //catch (Exception)
+            //{
+            //    Repository.AbortConversation();
+            //    throw;
+            //}
         }
     }
 }

@@ -45,6 +45,8 @@
             this.colCodice = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colValoreStr1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colNote = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colVersione = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.btnImporta = new DevExpress.XtraEditors.SimpleButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
@@ -70,6 +72,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnImporta);
             this.panel1.Controls.Add(this.btnClona);
             this.panel1.Controls.Add(this.btnCancella);
             this.panel1.Controls.Add(this.btnNuovo);
@@ -157,7 +160,7 @@
             // 
             // bndEtichette
             // 
-            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.TabellaLookupCollection);
+            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.RepositoryEtichettaCollection);
             // 
             // gridView1
             // 
@@ -186,7 +189,8 @@
             this.gridView1.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.colCodice,
             this.colValoreStr1,
-            this.colNote});
+            this.colNote,
+            this.colVersione});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsSelection.EnableAppearanceFocusedCell = false;
@@ -215,7 +219,7 @@
             this.colValoreStr1.AppearanceHeader.Options.UseTextOptions = true;
             this.colValoreStr1.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
             this.colValoreStr1.Caption = "STRUTTURA GS1";
-            this.colValoreStr1.FieldName = "ValoreStr1";
+            this.colValoreStr1.FieldName = "StrutturaGs1";
             this.colValoreStr1.Name = "colValoreStr1";
             this.colValoreStr1.OptionsColumn.AllowEdit = false;
             this.colValoreStr1.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
@@ -230,7 +234,7 @@
             this.colNote.AppearanceHeader.Options.UseTextOptions = true;
             this.colNote.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
             this.colNote.Caption = "NOTE";
-            this.colNote.FieldName = "Note";
+            this.colNote.FieldName = "Descrizione";
             this.colNote.Name = "colNote";
             this.colNote.OptionsColumn.AllowEdit = false;
             this.colNote.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
@@ -238,7 +242,35 @@
             this.colNote.OptionsFilter.AllowFilter = false;
             this.colNote.Visible = true;
             this.colNote.VisibleIndex = 2;
-            this.colNote.Width = 439;
+            this.colNote.Width = 376;
+            // 
+            // colVersione
+            // 
+            this.colVersione.AppearanceCell.Options.UseTextOptions = true;
+            this.colVersione.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+            this.colVersione.AppearanceHeader.Options.UseTextOptions = true;
+            this.colVersione.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+            this.colVersione.Caption = "VERSIONE";
+            this.colVersione.FieldName = "Versione";
+            this.colVersione.Name = "colVersione";
+            this.colVersione.OptionsColumn.AllowEdit = false;
+            this.colVersione.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+            this.colVersione.OptionsFilter.AllowAutoFilter = false;
+            this.colVersione.OptionsFilter.AllowFilter = false;
+            this.colVersione.Visible = true;
+            this.colVersione.VisibleIndex = 3;
+            this.colVersione.Width = 99;
+            // 
+            // btnImporta
+            // 
+            this.btnImporta.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.btnImporta.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("simpleButton1.ImageOptions.SvgImage")));
+            this.btnImporta.Location = new System.Drawing.Point(3, 10);
+            this.btnImporta.Name = "btnImporta";
+            this.btnImporta.Size = new System.Drawing.Size(50, 50);
+            this.btnImporta.TabIndex = 5;
+            this.btnImporta.ToolTip = "DESIGNER";
+            this.btnImporta.Click += new System.EventHandler(this.btnImporta_Click);
             // 
             // MainControlShellLabelDesigner
             // 
@@ -272,5 +304,7 @@
         private DevExpress.XtraEditors.SimpleButton btnNuovo;
         private DevExpress.XtraEditors.SimpleButton btnCancella;
         private DevExpress.XtraEditors.SimpleButton btnClona;
+        private DevExpress.XtraGrid.Columns.GridColumn colVersione;
+        private DevExpress.XtraEditors.SimpleButton btnImporta;
     }
 }

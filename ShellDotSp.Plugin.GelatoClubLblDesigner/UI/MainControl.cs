@@ -117,7 +117,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
             {
                 if (view.GetSelectedRows().Length == 1)
                 {
-                    _presenter.SetEtichetta((TabellaLookUp)view.GetRow(hitInfo.RowHandle));
+                    _presenter.SetEtichetta((RepositoryEtichetta)view.GetRow(hitInfo.RowHandle));
                 }
             }
         }
@@ -213,14 +213,12 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                 {
                     if (frm.ShowDialog() == DialogResult.OK)
                     {
-                        TabellaLookUp etichetta = new TabellaLookUp
+                        RepositoryEtichetta etichetta = new RepositoryEtichetta
                         {
-                            Tabella = "Etichette",
                             Codice = frm.Codice,
-                            Valore = frm.Codice,
-                            CodiceNumerico = 1,
-                            ValoreStr1 = frm.StrutturaGs1,
-                            Note = frm.Note
+                            Versione = 0,
+                            StrutturaGs1 = frm.StrutturaGs1,
+                            Descrizione = frm.Note
                         };
 
                         _presenter.GestisciEtichetta(etichetta);
@@ -243,13 +241,13 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                 try
                 {
                     frm.Codice = _presenter.EtichettaSelezionata.Codice;
-                    frm.StrutturaGs1 = _presenter.EtichettaSelezionata.ValoreStr1;
-                    frm.Note = _presenter.EtichettaSelezionata.Note;
+                    frm.StrutturaGs1 = _presenter.EtichettaSelezionata.StrutturaGs1;
+                    frm.Note = _presenter.EtichettaSelezionata.Descrizione;
 
                     if (frm.ShowDialog() == DialogResult.OK)
                     {
-                        _presenter.EtichettaSelezionata.ValoreStr1 = frm.StrutturaGs1;
-                        _presenter.EtichettaSelezionata.Note = frm.Note;
+                        _presenter.EtichettaSelezionata.StrutturaGs1 = frm.StrutturaGs1;
+                        _presenter.EtichettaSelezionata.Descrizione = frm.Note;
 
                         _presenter.GestisciEtichetta(_presenter.EtichettaSelezionata);
                     }
@@ -286,32 +284,42 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
 
         private void btnClona_Click(object sender, EventArgs e)
         {
-            var response = _msg.Question("Sei sicuro di voler clonare l'etichetta selezionata?");
+            //var response = _msg.Question("Sei sicuro di voler clonare l'etichetta selezionata?");
+
+            //if (response == DialogResult.No)
+            //    return;
+
+            //using (FrmClona frm = new FrmClona(_presenter))
+            //{
+            //    frm.CodicePrecedente = _presenter.EtichettaSelezionata.Codice;
+
+            //    if (frm.ShowDialog() == DialogResult.OK)
+            //    {
+            //        try
+            //        {
+            //            _presenter.ClonaEtichetta(frm.CodicePrecedente,
+            //                frm.CodiceNuovo,
+            //                _presenter.EtichettaSelezionata.Note);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            _msg.Error(ex.Message);
+            //        }
+            //    }
+
+            //    _presenter.LoadEtichette();
+            //    _presenter.SetEtichetta(null);
+        }
+
+        private void btnImporta_Click(object sender, EventArgs e)
+        {
+            var response = _msg.Question("Sei sicuro di voler importare le etichette dal repository su file ?");
 
             if (response == DialogResult.No)
                 return;
 
-            using (FrmClona frm = new FrmClona(_presenter))
-            {
-                frm.CodicePrecedente = _presenter.EtichettaSelezionata.Codice;
-
-                if (frm.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        _presenter.ClonaEtichetta(frm.CodicePrecedente,
-                            frm.CodiceNuovo,
-                            _presenter.EtichettaSelezionata.Note);
-                    }
-                    catch (Exception ex)
-                    {
-                        _msg.Error(ex.Message);
-                    }
-                }
-
-                _presenter.LoadEtichette();
-                _presenter.SetEtichetta(null);
-            }
+            _presenter.ImportaEtichetteDaFile();
         }
     }
 }
+

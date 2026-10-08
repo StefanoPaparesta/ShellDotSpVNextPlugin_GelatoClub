@@ -13,6 +13,7 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Model
         public string Descrizione { get; set; }
         public int Versione { get; set; }
         public byte[] Layout { get; set; }
+        public string StrutturaGs1 { get; set; }
     }
     public class RepositoryEtichettaCollection : BindingList<RepositoryEtichetta> { }
 }

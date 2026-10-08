@@ -229,6 +229,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\ShellDotSp.Plugin.GelatoClubCore.Model.RepositoryEtichettaCollection.datasource" />
     <None Include="Properties\DataSources\ShellDotSp.Plugin.GelatoClubCore.Model.TabellaLookupCollection.datasource" />
     <None Include="Resources\package_import48x48.png" />
   </ItemGroup>
