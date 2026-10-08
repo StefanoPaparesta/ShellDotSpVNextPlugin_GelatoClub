@@ -458,5 +458,24 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
                 _dataConfezionamentoManuale = false;
             }
         }
+
+        private void simpleButton1_Click(object sender, EventArgs e)
+        {
+            var errors = _presenter.VerificaDatiStampa();
+
+            if (errors.Count != 0)
+            {
+                _msg.ShowErrors(errors);
+                return;
+            }
+
+            var result = _presenter.InviaArticoloInProduzione(anteprima: true);
+
+            if (result.Status == ReturnValueStatus.Error)
+            {
+                _msg.Error(result.StatusMessage);
+            }
+
+        }
     }
 }

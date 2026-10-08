@@ -188,7 +188,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             }
         }
 
-        internal ReturnValue InviaArticoloInProduzione()
+        internal ReturnValue InviaArticoloInProduzione(bool anteprima = false)
         {
             ReturnValue returnValue = new ReturnValue();
 
@@ -265,13 +265,23 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                 {
                     List<ReportData> ds = new List<ReportData> { reportData };
 
+
                     using (XtraReport report = new XtraReport())
                     {
 
                         report.LoadLayout(fileName);
                         report.DataSource = ds;
-                        StampaReport(report, 10000, stampante.Valore);
+
+                        if (!anteprima)
+                        {
+                            StampaReport(report, 10000, stampante.Valore);
+                        }
+                        else
+                        {
+                            report.ShowPreviewDialog();
+                        }
                     }
+
                 }
                 else
                 {

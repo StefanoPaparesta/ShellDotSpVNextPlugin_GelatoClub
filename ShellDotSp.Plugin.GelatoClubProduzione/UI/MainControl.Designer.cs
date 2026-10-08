@@ -85,6 +85,7 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.lkLinee.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties.CalendarTimeProperties)).BeginInit();
@@ -797,12 +798,25 @@
             // 
             // panel4
             // 
+            this.panel4.Controls.Add(this.simpleButton1);
             this.panel4.Controls.Add(this.btnInvia);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel4.Location = new System.Drawing.Point(0, 541);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(1234, 85);
             this.panel4.TabIndex = 58;
+            // 
+            // simpleButton1
+            // 
+            this.simpleButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.simpleButton1.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.simpleButton1.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("simpleButton1.ImageOptions.SvgImage")));
+            this.simpleButton1.ImageOptions.SvgImageSize = new System.Drawing.Size(48, 48);
+            this.simpleButton1.Location = new System.Drawing.Point(1156, 8);
+            this.simpleButton1.Name = "simpleButton1";
+            this.simpleButton1.Size = new System.Drawing.Size(75, 68);
+            this.simpleButton1.TabIndex = 21;
+            this.simpleButton1.Click += new System.EventHandler(this.simpleButton1_Click);
             // 
             // MainControlGelatoClubProduzione
             // 
@@ -891,5 +905,6 @@
         private DevExpress.XtraEditors.LookUpEdit lkEtichette;
         private DevExpress.XtraEditors.SimpleButton btnImportaTesti;
         private DevExpress.XtraEditors.SimpleButton btnDataManuale;
+        private DevExpress.XtraEditors.SimpleButton simpleButton1;
     }
 }
