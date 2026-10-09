@@ -7,6 +7,7 @@ using ShellDotSp.Plugin.GelatoClubLblDesigner.Interfaces;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -41,7 +42,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
 
         public void LoadEtichette()
         {
-            string sql = "SELECT * FROM RepositoryEtichette ORDER BY Id";
+            string sql = "SELECT Id, Codice, Descrizione, Versione, StrutturaGs1 FROM RepositoryEtichette ORDER BY Id";
             Etichette = Repository.Query<RepositoryEtichetta>(sql).ToList();
 
             View.UpdateUI(MessaggioPlugin.EtichetteCaricate);
@@ -100,36 +101,54 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             return importate;
         }
 
-        internal string GetFileEtichettaSelezionata()
+        internal RepositoryEtichetta CaricaEtichettaSelezionata()
         {
-            if (EtichettaSelezionata == null || string.IsNullOrWhiteSpace(EtichettaSelezionata.Codice))
-                throw new InvalidOperationException("Selezionare un'etichetta con un codice valido.");
+            if (EtichettaSelezionata == null)
+                throw new InvalidOperationException("Selezionare un'etichetta.");
 
-            if (string.IsNullOrWhiteSpace(_cfg.RepositoryEtichette))
-                throw new InvalidOperationException("Il repository delle etichette non è configurato.");
+            var timer = Stopwatch.StartNew();
+            var etichetta = Repository.Query<RepositoryEtichetta>(
+                "SELECT * FROM RepositoryEtichette WHERE Id=@0", EtichettaSelezionata.Id).SingleOrDefault();
+            Log.Info($"Apertura designer: lettura DB {timer.ElapsedMilliseconds} ms, layout {etichetta?.Layout?.Length ?? 0} byte.");
+            if (etichetta == null)
+                throw new InvalidOperationException("L'etichetta selezionata non esiste più nel database.");
 
-            string fileName = Path.Combine(_cfg.RepositoryEtichette, EtichettaSelezionata.Codice + ".repx");
-
-            return fileName;
+            return etichetta;
         }
 
-        internal void CopiaEtichettaSalvata(string fileName)
+        internal void SalvaLayoutEtichetta(RepositoryEtichetta etichetta, byte[] layout)
         {
-            if (string.IsNullOrWhiteSpace(fileName) ||
-                !string.Equals(Path.GetExtension(fileName), ".repx", StringComparison.OrdinalIgnoreCase))
-                throw new ArgumentException("Il file dell'etichetta deve essere un REPX.", nameof(fileName));
+            if (etichetta == null)
+                throw new ArgumentNullException(nameof(etichetta));
+            if (layout == null || layout.Length == 0)
+                throw new ArgumentException("Il layout dell'etichetta è vuoto.", nameof(layout));
 
-            if (string.IsNullOrWhiteSpace(_paths.Etichette))
-                throw new InvalidOperationException("La cartella delle etichette non è configurata.");
+            int nuovaVersione;
+            Repository.StartConversation();
+            try
+            {
+                var corrente = Repository.Query<RepositoryEtichetta>(
+                    "SELECT Id, Versione FROM RepositoryEtichette WITH (UPDLOCK, HOLDLOCK) WHERE Id=@0",
+                    etichetta.Id).SingleOrDefault();
+                if (corrente == null)
+                    throw new InvalidOperationException("L'etichetta non esiste più nel database.");
+                if (corrente.Versione != etichetta.Versione)
+                    throw new InvalidOperationException("Il layout è stato modificato da un altro utente. Riaprire il designer per caricare la versione aggiornata.");
 
-            string sourcePath = Path.GetFullPath(fileName);
-            string destinationPath = Path.GetFullPath(Path.Combine(_paths.Etichette, Path.GetFileName(fileName)));
+                nuovaVersione = checked(corrente.Versione + 1);
+                Repository.Execute(
+                    "UPDATE RepositoryEtichette SET Layout=@0, Versione=@1 WHERE Id=@2",
+                    layout, nuovaVersione, etichetta.Id);
+                Repository.StopConversation();
+            }
+            catch
+            {
+                Repository.AbortConversation();
+                throw;
+            }
 
-            if (string.Equals(sourcePath, destinationPath, StringComparison.OrdinalIgnoreCase))
-                return;
-
-            Directory.CreateDirectory(_paths.Etichette);
-            File.Copy(sourcePath, destinationPath, overwrite: true);
+            etichetta.Layout = layout;
+            etichetta.Versione = nuovaVersione;
         }
 
         internal void SetEtichetta(RepositoryEtichetta etichetta)
@@ -150,7 +169,10 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             }
             else
             {
-                Repository.Update(etichetta);
+                // I metadati provengono dall'elenco, che non carica il layout.
+                Repository.Execute(
+                    "UPDATE RepositoryEtichette SET Codice=@0, Descrizione=@1, StrutturaGs1=@2 WHERE Id=@3",
+                    etichetta.Codice, etichetta.Descrizione, etichetta.StrutturaGs1, etichetta.Id);
             }
         }
 

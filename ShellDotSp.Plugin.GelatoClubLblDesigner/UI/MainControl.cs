@@ -15,7 +15,6 @@ using ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters;
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -122,11 +121,6 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
             }
         }
 
-        private void Designer_EtichettaSalvata(object sender, EtichettaSalvataEventArgs e)
-        {
-            _presenter.CopiaEtichettaSalvata(e.FileName);
-        }
-
         private void btnDesigner_Click(object sender, EventArgs e)
         {
             if (_presenter.EtichettaSelezionata == null)
@@ -134,9 +128,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
 
             try
             {
-                string fileName = _presenter.GetFileEtichettaSelezionata();
+                RepositoryEtichetta etichetta = _presenter.CaricaEtichettaSelezionata();
 
-                bool etichettaNuova = !File.Exists(fileName);
+                bool etichettaNuova = etichetta.Layout == null || etichetta.Layout.Length == 0;
 
                 int Larghezza = 0;
                 int Altezza = 0;
@@ -167,7 +161,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                     wait.ShowWaitForm();
                     try
                     {
-                        using (var designer = new FrmLabelDesigner(fileName, typeof(ReportDataCollection), Larghezza, Altezza,
+                        using (var designer = new FrmLabelDesigner(etichetta, layout => _presenter.SalvaLayoutEtichetta(etichetta, layout), typeof(ReportDataCollection), Larghezza, Altezza,
                             ReportPreviewData.Create))
                         {
                             EventHandler shown = (s, args) =>
@@ -176,7 +170,6 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                                     wait.CloseWaitForm();
                             };
                             designer.Shown += shown;
-                            designer.EtichettaSalvata += Designer_EtichettaSalvata;
                             try
                             {
                                 designer.ShowDialog(this);
@@ -184,7 +177,6 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                             finally
                             {
                                 designer.Shown -= shown;
-                                designer.EtichettaSalvata -= Designer_EtichettaSalvata;
                             }
                         }
                     }
@@ -195,6 +187,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                     }
                 }
 
+                _presenter.LoadEtichette();
                 _presenter.SetEtichetta(null);
             }
             catch (Exception ex)

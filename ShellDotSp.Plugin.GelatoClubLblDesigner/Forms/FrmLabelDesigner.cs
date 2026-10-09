@@ -7,12 +7,12 @@ using DevExpress.XtraReports.UserDesigner;
 
 using NLog;
 
-using ShellDotSp.Core.Model;
-using ShellDotSp.Plugin.GelatoClubCore.Config;
+using ShellDotSp.Plugin.GelatoClubCore.Model;
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Drawing.Design;
 using System.Drawing.Printing;
 using System.IO;
@@ -23,8 +23,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 {
     public partial class FrmLabelDesigner : XtraForm
     {
-        private ApplicationPaths _paths = ApplicationPaths.Instance;
-        private CfgPlugin _cfg = CfgPlugin.Instance;
+        private readonly Action<byte[]> _saveLayout;
 
         private static readonly HashSet<string> HiddenToolboxItems =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -45,8 +44,6 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                 "Character Comb"
             };
 
-        public event EventHandler<EtichettaSalvataEventArgs> EtichettaSalvata;
-
         private byte[] _savedLayout;
         private readonly Type _dataSourceType;
         private readonly Func<object> _previewDataFactory;
@@ -56,7 +53,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
         public FrmLabelDesigner()
         {
+            var timer = Stopwatch.StartNew();
             InitializeComponent();
+            _logger.Info($"Apertura designer: inizializzazione controlli {timer.ElapsedMilliseconds} ms.");
 
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReport, CommandVisibility.None);
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReportWizard, CommandVisibility.None);
@@ -68,45 +67,49 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             reportDesigner1.DesignPanelLoaded += ReportDesigner_DesignPanelLoaded;
         }
 
-        public FrmLabelDesigner(string fileName) : this()
-        {
-            OpenOrCreateLabel(fileName);
-        }
-
-        public FrmLabelDesigner(string fileName, Type dataSourceType, int Larghezza, int Altezza,
+        public FrmLabelDesigner(RepositoryEtichetta etichetta, Action<byte[]> saveLayout, Type dataSourceType, int Larghezza, int Altezza,
             Func<object> previewDataFactory = null) : this()
         {
+            _saveLayout = saveLayout ?? throw new ArgumentNullException(nameof(saveLayout));
             _dataSourceType = dataSourceType ?? throw new ArgumentNullException(nameof(dataSourceType));
             _previewDataFactory = previewDataFactory;
 
             _larghezza = Larghezza;
             _altezza = Altezza;
 
-            OpenOrCreateLabel(fileName);
+            OpenOrCreateLabel(etichetta);
         }
 
-        private void OpenOrCreateLabel(string fileName)
+        private void OpenOrCreateLabel(RepositoryEtichetta etichetta)
         {
-            if (string.IsNullOrWhiteSpace(fileName))
-                throw new ArgumentException("Specificare il percorso del REPX.", nameof(fileName));
+            if (etichetta == null || string.IsNullOrWhiteSpace(etichetta.Codice))
+                throw new ArgumentException("Specificare un'etichetta con un codice valido.", nameof(etichetta));
 
-            if (File.Exists(fileName))
+            if (etichetta.Layout != null && etichetta.Layout.Length > 0)
             {
-                string fName = Path.GetFileNameWithoutExtension(fileName);
+                string fName = etichetta.Codice;
                 var existingReport = new XtraReport();
                 try
                 {
-                    existingReport.LoadLayoutFromXml(fileName);
+                    var timer = Stopwatch.StartNew();
+                    using (var stream = new MemoryStream(etichetta.Layout, false))
+                        existingReport.LoadLayoutFromXml(stream);
+                    _logger.Info($"Apertura designer: caricamento XML {timer.ElapsedMilliseconds} ms.");
                     bool nomeModificato = existingReport.Name != fName || existingReport.DisplayName != fName;
                     // Imposta il nome prima che il designer crei il componente e il titolo del documento.
                     existingReport.Name = fName;
                     existingReport.DisplayName = fName;
+                    timer.Restart();
                     reportDesigner1.OpenReport(existingReport);
-                    reportDesigner1.ActiveDesignPanel.FileName = Path.GetFullPath(fileName);
+                    _logger.Info($"Apertura designer: OpenReport {timer.ElapsedMilliseconds} ms.");
                     reportDesigner1.ActiveDesignPanel.ReportState = nomeModificato
                         ? ReportState.Changed : ReportState.Saved;
                     if (!nomeModificato)
+                    {
+                        timer.Restart();
                         _savedLayout = GetLayout(reportDesigner1.ActiveDesignPanel);
+                        _logger.Info($"Apertura designer: snapshot layout {timer.ElapsedMilliseconds} ms.");
+                    }
                 }
                 catch
                 {
@@ -124,8 +127,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                 PaperKind = PaperKind.Custom,
                 PageWidth = _larghezza * 10,
                 PageHeight = _altezza * 10,
-                Name = Path.GetFileNameWithoutExtension(fileName),
-                DisplayName = Path.GetFileNameWithoutExtension(fileName),
+                Name = etichetta.Codice,
+                DisplayName = etichetta.Codice,
                 Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))),
             };
             var topMargin = new TopMarginBand();
@@ -147,7 +150,6 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             try
             {
                 reportDesigner1.OpenReport(report);
-                reportDesigner1.ActiveDesignPanel.FileName = Path.GetFullPath(fileName);
                 reportDesigner1.ActiveDesignPanel.ReportState = ReportState.Changed;
             }
             catch
@@ -162,7 +164,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             base.OnShown(e);
 
             // Il designer ripristina il layout durante l'apertura: applica la vista dopo il caricamento.
+            var timer = Stopwatch.StartNew();
             ConfigureDockPanels();
+            _logger.Info($"Apertura designer: pannelli OnShown {timer.ElapsedMilliseconds} ms.");
             BeginInvoke(new Action(CollapseBottomPanels));
         }
 
@@ -201,7 +205,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             var items = toolbox.GetToolboxItems().Cast<ToolboxItem>().ToArray();
             foreach (var item in items)
             {
-                _logger.Debug($"Toolbox item: {item.DisplayName}");
+                //_logger.Debug($"Toolbox item: {item.DisplayName}");
 
                 if (HiddenToolboxItems.Contains(item.DisplayName))
                     toolbox.RemoveToolboxItem(item);
@@ -210,8 +214,13 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
         private void ReportDesigner_DesignPanelLoaded(object sender, DesignerLoadedEventArgs e)
         {
+            var timer = Stopwatch.StartNew();
             ConfigureDockPanels();
+            _logger.Info($"Apertura designer: pannelli DesignPanelLoaded {timer.ElapsedMilliseconds} ms.");
+            timer.Restart();
             ConfigureToolbox(e.DesignerHost);
+            _logger.Info($"Apertura designer: toolbox {timer.ElapsedMilliseconds} ms.");
+            timer.Restart();
             ((XRDesignPanel)sender).SelectedTabIndexChanged += DesignPanel_SelectedTabIndexChanged;
             ((XRDesignPanel)sender).AddCommandHandler(new SaveLabelCommandHandler(this, (XRDesignPanel)sender));
             if (_previewDataFactory != null)
@@ -220,8 +229,10 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                 if (tabs != null)
                     tabs.PreviewReportCreated += PreviewReportCreated;
             }
+            _logger.Info($"Apertura designer: collegamento comandi e anteprima {timer.ElapsedMilliseconds} ms.");
             if (_dataSourceType == null)
                 return;
+            timer.Restart();
 
             var panel = (XRDesignPanel)sender;
             var report = panel.Report;
@@ -248,8 +259,11 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             report.DataSource = dataSource;
             report.DataMember = string.Empty;
 
+            _logger.Info($"Apertura designer: configurazione sorgente dati {timer.ElapsedMilliseconds} ms.");
+            timer.Restart();
             var host = (IDesignerHost)panel.GetService(typeof(IDesignerHost));
             fieldListDockPanel1.UpdateDataSource(host);
+            _logger.Info($"Apertura designer: aggiornamento elenco campi {timer.ElapsedMilliseconds} ms.");
         }
 
         private static byte[] GetLayout(XRDesignPanel panel)
@@ -324,46 +338,19 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
             public void HandleCommand(ReportCommand command, object[] args)
             {
-                string fileName = _panel.FileName;
-
-                if (command == ReportCommand.SaveFileAs || string.IsNullOrWhiteSpace(fileName))
-                {
-                    using (var dialog = XRDesignPanel.CreateSaveFileDialog(_panel.Report, fileName))
-                    {
-                        if (dialog.ShowDialog(_owner) != DialogResult.OK)
-                            return;
-                        fileName = dialog.FileName;
-                    }
-                }
-
                 try
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(fileName)));
-                    _panel.Report.SaveLayoutToXml(fileName);
-                    _panel.FileName = fileName;
-                    _owner._savedLayout = GetLayout(_panel);
+                    byte[] layout = GetLayout(_panel);
+                    _owner._saveLayout(layout);
+                    // Il pannello risulta salvato soltanto dopo il completamento della scrittura nel DB.
+                    _owner._savedLayout = layout;
                     _panel.ReportState = ReportState.Saved;
                 }
                 catch (Exception ex)
                 {
-                    _owner._logger.Error(ex, "Errore durante il salvataggio dell'etichetta");
+                    _owner._logger.Error(ex, "Errore durante il salvataggio dell'etichetta nel database");
                     XtraMessageBox.Show(_owner, ex.Message, "Salvataggio etichetta",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                try
-                {
-                    _owner.EtichettaSalvata?.Invoke(_owner,
-                        new EtichettaSalvataEventArgs(fileName, _panel.Report));
-
-
-                }
-                catch (Exception ex)
-                {
-                    _owner._logger.Error(ex, "Errore nelle operazioni successive al salvataggio dell'etichetta");
-                    XtraMessageBox.Show(_owner, "Etichetta salvata, ma le operazioni successive sono fallite: " + ex.Message,
-                        "Operazioni dopo il salvataggio", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -374,15 +361,4 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
         }
     }
 
-    public sealed class EtichettaSalvataEventArgs : EventArgs
-    {
-        public string FileName { get; }
-        public XtraReport Report { get; }
-
-        public EtichettaSalvataEventArgs(string fileName, XtraReport report)
-        {
-            FileName = fileName;
-            Report = report;
-        }
-    }
 }
