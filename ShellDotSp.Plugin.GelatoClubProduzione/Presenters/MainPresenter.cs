@@ -30,6 +30,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         public DateTime DataConfezionamento { get; set; }
         public DateTime DataScadenza { get; set; }
         public string CodiceBarcode { get; set; }
+        public bool TestStampante { get; set; } = true;
 
         public List<EtichettaTesto> Testi1 = new List<EtichettaTesto>();
         public List<LookUpdataTesto> TestiStandard1 = new List<LookUpdataTesto>();
@@ -272,14 +273,9 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                         report.LoadLayout(fileName);
                         report.DataSource = ds;
 
-                        if (!anteprima)
-                        {
-                            StampaReport(report, 10000, stampante.Valore);
-                        }
-                        else
-                        {
-                            report.ShowPreviewDialog();
-                        }
+                        short numeroCopie = TestStampante ? (short)1 : (short)10000;
+
+                        StampaReport(report, numeroCopie, stampante.Valore, anteprima);
                     }
 
                 }
@@ -304,16 +300,64 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             return returnValue;
         }
 
-        private void StampaReport(XtraReport report, short numeroCopie, string nomeStampante)
+        private void StampaReport(XtraReport report, short numeroCopie, string nomeStampante, bool anteprima = false)
         {
-            using (ReportPrintTool printTool = new ReportPrintTool(report))
+            // Seleziona la stampante della linea prima che venga generato il documento.
+            var impostazioniStampante = new System.Drawing.Printing.PrinterSettings
             {
-                printTool.PrintingSystem.StartPrint += (s, e) =>
-                {
-                    e.PrintDocument.PrinterSettings.Copies = numeroCopie;
-                };
+                PrinterName = nomeStampante
+            };
+            if (!impostazioniStampante.IsValid)
+                throw new InvalidOperationException($"Stampante non disponibile: {nomeStampante}");
 
-                printTool.Print(nomeStampante);
+            report.PrinterName = nomeStampante;
+            bool usaFormatoStampante = report.DefaultPrinterSettingsUsing.UsePaperKind;
+            bool usaOrientamentoStampante = report.DefaultPrinterSettingsUsing.UseLandscape;
+            var paginaStampante = impostazioniStampante.DefaultPageSettings;
+
+            // Le opzioni del REPX ereditano queste impostazioni anche durante la paginazione.
+            // L'override e' locale a questa operazione: non modifica la stampante predefinita di Windows.
+            var paginaPrecedente = (System.Drawing.Printing.PageSettings)
+                DevExpress.XtraPrinting.PageSettingsHelper.DefaultPageSettings.Clone();
+            try
+            {
+                DevExpress.XtraPrinting.PageSettingsHelper.SetDefaultPageSettings(impostazioniStampante, paginaStampante);
+                Log.Info("Prima generazione: report={report}, larghezza={larghezza}, altezza={altezza}, unita={unita}, landscape={landscape}",
+                    report.Name, report.PageWidth, report.PageHeight, report.ReportUnit, report.Landscape);
+                report.CreateDocument();
+                Log.Info("Documento generato: pagine={pagine}, larghezza={larghezza}, altezza={altezza}, unita={unita}, landscape={landscape}",
+                    report.PrintingSystem.Document.Pages.Count, report.PageWidth, report.PageHeight, report.ReportUnit, report.Landscape);
+
+                using (ReportPrintTool printTool = new ReportPrintTool(report))
+                {
+                    printTool.PrinterSettings.PrinterName = nomeStampante;
+                    // Imposta le copie prima della stampa, senza sostituire le impostazioni negli eventi.
+                    if (!anteprima)
+                        printTool.PrinterSettings.Copies = numeroCopie;
+
+                    printTool.PrintingSystem.StartPrint += (s, e) =>
+                    {
+                        var paginaEffettiva = e.PrintDocument.DefaultPageSettings;
+                        Log.Info("Pagina di stampa: pagineDocumento={pagine}, larghezza={larghezza}, altezza={altezza}, landscape={landscape}, areaStampabile={area}",
+                            report.PrintingSystem.Document.Pages.Count, paginaEffettiva.PaperSize.Width,
+                            paginaEffettiva.PaperSize.Height, paginaEffettiva.Landscape, paginaEffettiva.PrintableArea);
+
+                        Log.Info("Avvio stampa: stampante={stampante}, anteprima={anteprima}, copie={copie}, usaFormatoStampante={usaFormato}, usaOrientamentoStampante={usaOrientamento}, formatoDriver={formato}, larghezzaDriver={larghezza}, altezzaDriver={altezza}, landscapeDriver={landscape}",
+                            e.PrintDocument.PrinterSettings.PrinterName, anteprima,
+                            e.PrintDocument.PrinterSettings.Copies, usaFormatoStampante, usaOrientamentoStampante,
+                            paginaStampante.PaperSize.PaperName, paginaStampante.PaperSize.Width,
+                            paginaStampante.PaperSize.Height, paginaStampante.Landscape);
+                    };
+
+                    if (anteprima)
+                        printTool.ShowPreviewDialog();
+                    else
+                        printTool.Print(nomeStampante);
+                }
+            }
+            finally
+            {
+                DevExpress.XtraPrinting.PageSettingsHelper.SetDefaultPageSettings(paginaPrecedente.PrinterSettings, paginaPrecedente);
             }
         }
 
