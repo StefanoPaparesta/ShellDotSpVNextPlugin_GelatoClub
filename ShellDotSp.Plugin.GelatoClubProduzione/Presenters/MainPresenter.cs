@@ -315,13 +315,42 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             bool usaOrientamentoStampante = report.DefaultPrinterSettingsUsing.UseLandscape;
             var paginaStampante = impostazioniStampante.DefaultPageSettings;
 
-            // Le opzioni del REPX ereditano queste impostazioni anche durante la paginazione.
-            // L'override e' locale a questa operazione: non modifica la stampante predefinita di Windows.
-            var paginaPrecedente = (System.Drawing.Printing.PageSettings)
-                DevExpress.XtraPrinting.PageSettingsHelper.DefaultPageSettings.Clone();
+            // Risolvi le opzioni del REPX sul report, evitando le impostazioni globali di DevExpress.
+            report.DefaultPrinterSettingsUsing.UsePaperKind = false;
+            report.DefaultPrinterSettingsUsing.UseLandscape = false;
             try
             {
-                DevExpress.XtraPrinting.PageSettingsHelper.SetDefaultPageSettings(impostazioniStampante, paginaStampante);
+                // Landscape scambia le dimensioni: assegnalo prima del formato esplicito.
+                if (usaOrientamentoStampante)
+                    report.Landscape = paginaStampante.Landscape;
+
+                if (usaFormatoStampante)
+                {
+                    var formato = paginaStampante.PaperSize;
+                    if (formato.Width <= 0 || formato.Height <= 0)
+                        throw new InvalidOperationException($"Formato carta non valido per {nomeStampante}");
+
+                    double fattore;
+                    switch (report.ReportUnit)
+                    {
+                        case ReportUnit.TenthsOfAMillimeter:
+                            fattore = 2.54; // Il driver espone centesimi di pollice.
+                            break;
+                        case ReportUnit.HundredthsOfAnInch:
+                            fattore = 1;
+                            break;
+                        case ReportUnit.Pixels:
+                            fattore = 0.96; // ReportUnit.Pixels usa 96 DPI.
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Unita report non supportata: {report.ReportUnit}");
+                    }
+
+                    report.PaperKind = System.Drawing.Printing.PaperKind.Custom;
+                    report.PaperName = formato.PaperName;
+                    report.PageWidth = (int)Math.Round((report.Landscape ? formato.Height : formato.Width) * fattore);
+                    report.PageHeight = (int)Math.Round((report.Landscape ? formato.Width : formato.Height) * fattore);
+                }
                 Log.Info("Prima generazione: report={report}, larghezza={larghezza}, altezza={altezza}, unita={unita}, landscape={landscape}",
                     report.Name, report.PageWidth, report.PageHeight, report.ReportUnit, report.Landscape);
                 report.CreateDocument();
@@ -357,7 +386,8 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             }
             finally
             {
-                DevExpress.XtraPrinting.PageSettingsHelper.SetDefaultPageSettings(paginaPrecedente.PrinterSettings, paginaPrecedente);
+                report.DefaultPrinterSettingsUsing.UsePaperKind = usaFormatoStampante;
+                report.DefaultPrinterSettingsUsing.UseLandscape = usaOrientamentoStampante;
             }
         }
 
