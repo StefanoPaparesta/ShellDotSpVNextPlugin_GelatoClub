@@ -30,7 +30,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         public DateTime DataConfezionamento { get; set; }
         public DateTime DataScadenza { get; set; }
         public string CodiceBarcode { get; set; }
-        public bool TestStampante { get; set; } = true;
+        public bool TestStampante { get; set; } = false;
 
         public List<EtichettaTesto> Testi1 = new List<EtichettaTesto>();
         public List<LookUpdataTesto> TestiStandard1 = new List<LookUpdataTesto>();
