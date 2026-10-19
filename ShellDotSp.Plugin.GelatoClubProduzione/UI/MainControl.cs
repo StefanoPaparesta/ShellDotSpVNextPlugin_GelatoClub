@@ -459,7 +459,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
             }
         }
 
-        private void simpleButton1_Click(object sender, EventArgs e)
+        private void btnAnteprima_Click(object sender, EventArgs e)
         {
             var errors = _presenter.VerificaDatiStampa();
 

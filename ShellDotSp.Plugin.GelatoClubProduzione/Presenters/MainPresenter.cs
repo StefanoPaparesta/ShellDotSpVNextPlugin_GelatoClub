@@ -1,4 +1,5 @@
-﻿using DevExpress.XtraReports.UI;
+﻿using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.UI;
 
 using NPoco;
 
@@ -379,9 +380,17 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                     };
 
                     if (anteprima)
+                    {
+                        printTool.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.Print, CommandVisibility.None);
+                        printTool.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.PrintDirect, CommandVisibility.None);
+                        printTool.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.PrintSelection, CommandVisibility.None);
+
                         printTool.ShowPreviewDialog();
+                    }
                     else
+                    {
                         printTool.Print(nomeStampante);
+                    }
                 }
             }
             finally

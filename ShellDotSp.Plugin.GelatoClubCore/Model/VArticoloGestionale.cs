@@ -26,6 +26,12 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Model
         public string DescrCommercialeXXX { get; set; }
         public decimal QuantBarcode { get; set; }
         public string VolUMP { get; set; }
+        public string NoteConservazioneITA { get; set; }
+        public string NoteConservazioneINGLESE { get; set; }
+        public string NoteConservazioneFRANCESE { get; set; }
+        public string NoteConservazioneSPAGNOLO { get; set; }
+        public string NoteConservazioneTEDESCO { get; set; }
+        public string NoteConservazioneXXX { get; set; }
     }
     public class VArticoloGestionaleCollection : BindingList<VArticoloGestionale> { }
 }

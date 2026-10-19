@@ -34,6 +34,13 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Model
 
         public string Descrizione1 { get; set; }
         public string Descrizione2 { get; set; }
+
+        public string NoteConservazioneITA { get; set; }
+        public string NoteConservazioneINGLESE { get; set; }
+        public string NoteConservazioneFRANCESE { get; set; }
+        public string NoteConservazioneSPAGNOLO { get; set; }
+        public string NoteConservazioneTEDESCO { get; set; }
+        public string NoteConservazioneXXX { get; set; }
     }
     public class ReportDataCollection : BindingList<ReportData> { }
 }
