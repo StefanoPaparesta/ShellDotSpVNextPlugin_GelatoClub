@@ -48,7 +48,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 240);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(418, 72);
+            this.panel1.Size = new System.Drawing.Size(426, 72);
             this.panel1.TabIndex = 3;
             // 
             // btnConferma
@@ -68,7 +68,7 @@
             this.btnAnnulla.Appearance.Font = new System.Drawing.Font("Tahoma", 13F);
             this.btnAnnulla.Appearance.Options.UseFont = true;
             this.btnAnnulla.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnAnnulla.ImageOptions.SvgImage")));
-            this.btnAnnulla.Location = new System.Drawing.Point(266, 14);
+            this.btnAnnulla.Location = new System.Drawing.Point(274, 14);
             this.btnAnnulla.Name = "btnAnnulla";
             this.btnAnnulla.Size = new System.Drawing.Size(140, 45);
             this.btnAnnulla.TabIndex = 18;
@@ -123,7 +123,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(418, 312);
+            this.ClientSize = new System.Drawing.Size(426, 312);
             this.Controls.Add(this.txCodicePrecedente);
             this.Controls.Add(this.labelControl2);
             this.Controls.Add(this.txCodiceNuovo);

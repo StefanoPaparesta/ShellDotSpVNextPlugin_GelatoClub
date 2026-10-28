@@ -384,7 +384,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.UI
 
         private void lkEtichette_EditValueChanged(object sender, EventArgs e)
         {
-            var etichetta = (Etichetta)lkEtichette.GetSelectedDataRow();
+            var etichetta = (RepositoryEtichetta)lkEtichette.GetSelectedDataRow();
 
             if (!_etichettaSelFromPresenter)
             {

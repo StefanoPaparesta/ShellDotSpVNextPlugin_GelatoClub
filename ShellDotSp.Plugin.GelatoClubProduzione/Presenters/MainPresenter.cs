@@ -27,7 +27,6 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         public StatoLinea StatoLineaCorrente { get; set; }
         public VArticoloGestionale ArticoloSelezionato { get; set; }
         public string Lotto { get; set; }
-        private ApplicationPaths _paths = ApplicationPaths.Instance;
         public DateTime DataConfezionamento { get; set; }
         public DateTime DataScadenza { get; set; }
         public string CodiceBarcode { get; set; }
@@ -37,7 +36,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         public List<LookUpdataTesto> TestiStandard1 = new List<LookUpdataTesto>();
         public List<EtichettaTesto> Testi2 = new List<EtichettaTesto>();
         public List<LookUpdataTesto> TestiStandard2 = new List<LookUpdataTesto>();
-        public List<Etichetta> Etichette { get; set; }
+        public List<RepositoryEtichetta> Etichette { get; set; }
         public EtichettaPersonalizzata EtichettaSelezionata { get; set; }
 
         public EtichettaTesto Testo1Selezionato { get; set; }
@@ -95,15 +94,9 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                  })
                 .ToList();
 
-            Etichette = Repository.Query<TabellaLookUp>(sql, "Etichette")
-               .Select(x => new Etichetta
-               {
-                   Id = x.Id,
-                   Codice = x.Codice,
-                   Valore = x.Valore,
-                   ValoreStr1 = x.ValoreStr1
-               })
-               .ToList();
+            Etichette = Repository.Query<RepositoryEtichetta>(
+                "SELECT Id, Codice, Descrizione, Versione, StrutturaGs1 FROM RepositoryEtichette ORDER BY Codice")
+                .ToList();
         }
 
         internal void SetLineaSelezionata(LookUpData linea)
@@ -215,7 +208,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
 
             var (etichettaPers, continuaEtichettaPers) = GestisciEtichettePers();
 
-            if (!continuaTesti)
+            if (!continuaEtichettaPers)
             {
                 returnValue.Status = ReturnValueStatus.Error;
                 returnValue.StatusMessage = $"Errore gestione etichetta personalizzata";
@@ -238,21 +231,30 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                 Log.Info("Stampante associata alla linea: {stampante}", stampante != null ? stampante.Valore : "Nessuna");
 
 
-                var etichettaReale = Etichette
-                    .Where(c => c.Codice == layoutEtichetta)
-                    .SingleOrDefault();
+                if (stampante == null || string.IsNullOrWhiteSpace(stampante.Valore))
+                    throw new InvalidOperationException("Nessuna stampante configurata per la linea selezionata.");
+
+                // Legge la versione corrente, incluso il layout salvato dal designer.
+                var etichettaReale = Repository.Query<RepositoryEtichetta>(
+                    "SELECT * FROM RepositoryEtichette WHERE Codice=@0", layoutEtichetta).SingleOrDefault();
 
                 if (etichettaReale == null)
                 {
                     returnValue.Status = ReturnValueStatus.Error;
-                    returnValue.StatusMessage = $"Errore ricerca etichetta reale";
+                    returnValue.StatusMessage = $"Etichetta non trovata nel repository: {layoutEtichetta}";
 
                     return returnValue;
                 }
 
+                if (etichettaReale.Layout == null || etichettaReale.Layout.Length == 0)
+                    throw new InvalidOperationException($"Il layout dell'etichetta {layoutEtichetta} non è stato salvato nel repository.");
+
+                if (string.IsNullOrWhiteSpace(etichettaReale.StrutturaGs1))
+                    throw new InvalidOperationException($"La struttura GS1 dell'etichetta {layoutEtichetta} non è configurata.");
+
                 CalcoloDataScadenza(CalcoloScadenza.Mesi, ArticoloSelezionato.MesiValiditaLotto, ArticoloSelezionato.ScadenzaAFineMese == "S");
 
-                CalcolaCodiceBarcode(etichettaReale.ValoreStr1);
+                CalcolaCodiceBarcode(etichettaReale.StrutturaGs1);
 
                 ReportData reportData = ReportDataMapper.ToReportData(ArticoloSelezionato);
                 reportData.Lotto = Lotto;
@@ -261,29 +263,21 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                 reportData.Descrizione1 = testo1Stampa.DescrizioneCompleta;
                 reportData.Descrizione2 = testo2Stampa.DescrizioneCompleta;
 
-                string fileName = Path.Combine(_paths.Etichette, $"{etichettaReale.Codice}.repx");
+                List<ReportData> ds = new List<ReportData> { reportData };
 
-                if (File.Exists(fileName))
+                using (var stream = new MemoryStream(etichettaReale.Layout, false))
+                using (XtraReport report = new XtraReport())
                 {
-                    List<ReportData> ds = new List<ReportData> { reportData };
+                    report.LoadLayoutFromXml(stream);
+                    report.DataSource = ds;
+                    report.DataMember = string.Empty;
 
+                    short numeroCopie = TestStampante ? (short)1 : (short)10000;
 
-                    using (XtraReport report = new XtraReport())
-                    {
+                    Log.Info("Stampa da repository: etichetta={codice}, versione={versione}, anteprima={anteprima}",
+                        etichettaReale.Codice, etichettaReale.Versione, anteprima);
 
-                        report.LoadLayout(fileName);
-                        report.DataSource = ds;
-
-                        short numeroCopie = TestStampante ? (short)1 : (short)10000;
-
-                        StampaReport(report, numeroCopie, stampante.Valore, anteprima);
-                    }
-
-                }
-                else
-                {
-                    returnValue.Status = ReturnValueStatus.Error;
-                    returnValue.StatusMessage = $"File etichetta non trovato: {fileName}";
+                    StampaReport(report, numeroCopie, stampante.Valore, anteprima);
                 }
 
             }

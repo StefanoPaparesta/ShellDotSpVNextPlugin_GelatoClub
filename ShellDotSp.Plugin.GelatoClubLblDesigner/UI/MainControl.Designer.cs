@@ -34,6 +34,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainControlShellLabelDesigner));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnImporta = new DevExpress.XtraEditors.SimpleButton();
             this.btnClona = new DevExpress.XtraEditors.SimpleButton();
             this.btnCancella = new DevExpress.XtraEditors.SimpleButton();
             this.btnNuovo = new DevExpress.XtraEditors.SimpleButton();
@@ -46,7 +47,6 @@
             this.colValoreStr1 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colNote = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colVersione = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.btnImporta = new DevExpress.XtraEditors.SimpleButton();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
@@ -84,6 +84,17 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(900, 70);
             this.panel1.TabIndex = 0;
+            // 
+            // btnImporta
+            // 
+            this.btnImporta.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.btnImporta.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnImporta.ImageOptions.SvgImage")));
+            this.btnImporta.Location = new System.Drawing.Point(3, 10);
+            this.btnImporta.Name = "btnImporta";
+            this.btnImporta.Size = new System.Drawing.Size(50, 50);
+            this.btnImporta.TabIndex = 5;
+            this.btnImporta.ToolTip = "DESIGNER";
+            this.btnImporta.Click += new System.EventHandler(this.btnImporta_Click);
             // 
             // btnClona
             // 
@@ -126,7 +137,7 @@
             this.btnDesigner.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDesigner.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnDesigner.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btnDesigner.ImageOptions.SvgImage")));
-            this.btnDesigner.Location = new System.Drawing.Point(577, 10);
+            this.btnDesigner.Location = new System.Drawing.Point(582, 10);
             this.btnDesigner.Name = "btnDesigner";
             this.btnDesigner.Size = new System.Drawing.Size(50, 50);
             this.btnDesigner.TabIndex = 1;
@@ -260,17 +271,6 @@
             this.colVersione.Visible = true;
             this.colVersione.VisibleIndex = 3;
             this.colVersione.Width = 99;
-            // 
-            // btnImporta
-            // 
-            this.btnImporta.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
-            this.btnImporta.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("simpleButton1.ImageOptions.SvgImage")));
-            this.btnImporta.Location = new System.Drawing.Point(3, 10);
-            this.btnImporta.Name = "btnImporta";
-            this.btnImporta.Size = new System.Drawing.Size(50, 50);
-            this.btnImporta.TabIndex = 5;
-            this.btnImporta.ToolTip = "DESIGNER";
-            this.btnImporta.Click += new System.EventHandler(this.btnImporta_Click);
             // 
             // MainControlShellLabelDesigner
             // 

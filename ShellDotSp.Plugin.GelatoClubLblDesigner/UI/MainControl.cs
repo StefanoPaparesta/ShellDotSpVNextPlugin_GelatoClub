@@ -6,6 +6,7 @@ using DotSpExtensions.Winforms;
 
 using NLog.Fluent;
 
+using ShellDotSp.Plugin.GelatoClubCore.Config;
 using ShellDotSp.Plugin.GelatoClubCore.Model;
 using ShellDotSp.Plugin.GelatoClubLblDesigner.Core;
 using ShellDotSp.Plugin.GelatoClubLblDesigner.Forms;
@@ -28,6 +29,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
         private static int _reportOpeningCount;
         private MainPresenter _presenter;
         private MsgBoxHelper _msg = new MsgBoxHelper("Designer");
+        private CfgPlugin _cfg = CfgPlugin.Instance;
 
         public MainControlShellLabelDesigner()
         {
@@ -69,6 +71,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
         public void Inizializza()
         {
             InvokeViewInitialized(EventArgs.Empty);
+
+            btnImporta.Enabled = _cfg.AbilitaImporFileEtichette;
         }
 
         public void UpdateUI(MessaggioPlugin messaggio)
@@ -128,9 +132,19 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
             if (_presenter.EtichettaSelezionata == null)
                 return;
 
+            var openingWatch = Stopwatch.StartNew();
+            int openingNumber = System.Threading.Interlocked.Increment(ref _reportOpeningCount);
+
             try
             {
+                Log.Info().Message("REPORT_OPEN inizio dal clic apertura={0} primaApertura={1} etichetta={2}",
+                    openingNumber, openingNumber == 1, _presenter.EtichettaSelezionata.Codice).Write();
+                var databaseWatch = Stopwatch.StartNew();
                 RepositoryEtichetta etichetta = _presenter.CaricaEtichettaSelezionata();
+                databaseWatch.Stop();
+                Log.Info().Message("REPORT_OPEN recupero DB apertura={0} etichetta={1} durataDbMs={2} totaleDalClicMs={3} layoutBytes={4}",
+                    openingNumber, etichetta.Codice, databaseWatch.ElapsedMilliseconds,
+                    openingWatch.ElapsedMilliseconds, etichetta.Layout == null ? 0 : etichetta.Layout.Length).Write();
 
                 bool etichettaNuova = etichetta.Layout == null || etichetta.Layout.Length == 0;
 
@@ -155,10 +169,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                     }
                 }
 
-                int openingNumber = System.Threading.Interlocked.Increment(ref _reportOpeningCount);
-                var openingWatch = Stopwatch.StartNew();
-                Log.Info().Message("REPORT_OPEN inizio apertura={0} primaApertura={1} etichetta={2}",
-                    openingNumber, openingNumber == 1, etichetta.Codice).Write();
+
+                var designerWatch = Stopwatch.StartNew();
                 var parentForm = FindForm();
 
                 using (var wait = new DevExpress.XtraSplashScreen.SplashScreenManager(parentForm, typeof(WaitForm1), false, false))
@@ -167,28 +179,38 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                     wait.ShowWaitForm();
                     try
                     {
-                        using (var designer = new FrmLabelDesigner(etichetta, layout => _presenter.SalvaLayoutEtichetta(etichetta, layout), typeof(ReportDataCollection), Larghezza, Altezza,
-                            ReportPreviewData.Create))
+                        bool ricarica;
+                        do
                         {
-                            EventHandler shown = (s, args) =>
+                            ricarica = false;
+                            using (var designer = new FrmLabelDesigner(etichetta, (layout, versioneConfermata) => _presenter.SalvaLayoutEtichetta(etichetta, layout, versioneConfermata), typeof(ReportDataCollection), Larghezza, Altezza,
+                                ReportPreviewData.Create))
                             {
-                                if (wait.IsSplashFormVisible)
-                                    wait.CloseWaitForm();
-                                openingWatch.Stop();
-                                Log.Info().Message("REPORT_OPEN finestra mostrata id={0} apertura={1} primaApertura={2} etichetta={3} totaleMs={4}",
-                                    designer.OpeningId, openingNumber, openingNumber == 1, etichetta.Codice,
-                                    openingWatch.ElapsedMilliseconds).Write();
-                            };
-                            designer.Shown += shown;
-                            try
-                            {
-                                designer.ShowDialog(this);
+                                EventHandler shown = (s, args) =>
+                                {
+                                    if (wait.IsSplashFormVisible)
+                                        wait.CloseWaitForm();
+                                    openingWatch.Stop();
+                                    designerWatch.Stop();
+                                    Log.Info().Message("REPORT_OPEN finestra mostrata id={0} apertura={1} primaApertura={2} etichetta={3} totaleMs={4} aperturaDesignerMs={5}",
+                                        designer.OpeningId, openingNumber, openingNumber == 1, etichetta.Codice,
+                                        openingWatch.ElapsedMilliseconds, designerWatch.ElapsedMilliseconds).Write();
+                                };
+                                designer.Shown += shown;
+                                try
+                                {
+                                    designer.ShowDialog(this);
+                                    ricarica = designer.ReloadRequested;
+                                }
+                                finally
+                                {
+                                    designer.Shown -= shown;
+                                }
                             }
-                            finally
-                            {
-                                designer.Shown -= shown;
-                            }
-                        }
+
+                            if (ricarica)
+                                etichetta = _presenter.CaricaEtichettaSelezionata();
+                        } while (ricarica);
                     }
                     finally
                     {
@@ -287,31 +309,27 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
 
         private void btnClona_Click(object sender, EventArgs e)
         {
-            //var response = _msg.Question("Sei sicuro di voler clonare l'etichetta selezionata?");
+            if (_presenter.EtichettaSelezionata == null)
+                return;
 
-            //if (response == DialogResult.No)
-            //    return;
+            using (var frm = new FrmClona(_presenter))
+            {
+                frm.CodicePrecedente = _presenter.EtichettaSelezionata.Codice;
+                if (frm.ShowDialog(this) != DialogResult.OK)
+                    return;
 
-            //using (FrmClona frm = new FrmClona(_presenter))
-            //{
-            //    frm.CodicePrecedente = _presenter.EtichettaSelezionata.Codice;
-
-            //    if (frm.ShowDialog() == DialogResult.OK)
-            //    {
-            //        try
-            //        {
-            //            _presenter.ClonaEtichetta(frm.CodicePrecedente,
-            //                frm.CodiceNuovo,
-            //                _presenter.EtichettaSelezionata.Note);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            _msg.Error(ex.Message);
-            //        }
-            //    }
-
-            //    _presenter.LoadEtichette();
-            //    _presenter.SetEtichetta(null);
+                try
+                {
+                    _presenter.ClonaEtichetta(frm.CodiceNuovo);
+                    _presenter.LoadEtichette();
+                    _presenter.SetEtichetta(null);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error().Exception(ex).Message("Errore durante la clonazione dell'etichetta").Write();
+                    _msg.Error(ex.Message);
+                }
+            }
         }
 
         private void btnImporta_Click(object sender, EventArgs e)
@@ -321,7 +339,16 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
             if (response == DialogResult.No)
                 return;
 
-            _presenter.ImportaEtichetteDaFile();
+            int numeroImportate = _presenter.ImportaEtichetteDaFile();
+
+            if (numeroImportate > 0)
+            {
+                _msg.Info($"Importate {numeroImportate} etichette !!");
+            }
+            else
+            {
+                _msg.Error($"Importate {numeroImportate} etichette !!");
+            }
         }
     }
 }

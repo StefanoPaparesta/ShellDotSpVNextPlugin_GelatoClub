@@ -8,6 +8,7 @@ using DevExpress.XtraReports.UserDesigner;
 using NLog;
 
 using ShellDotSp.Plugin.GelatoClubCore.Model;
+using ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters;
 
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 {
     public partial class FrmLabelDesigner : XtraForm
     {
-        private readonly Action<byte[]> _saveLayout;
+        private readonly Action<byte[], int?> _saveLayout;
 
         private static readonly HashSet<string> HiddenToolboxItems =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -50,6 +51,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
         private readonly string _openingId = Guid.NewGuid().ToString("N");
 
         public string OpeningId => _openingId;
+        public bool ReloadRequested { get; private set; }
 
         private void LogOpeningStage(string stage)
         {
@@ -82,7 +84,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             reportDesigner1.DesignPanelLoaded += ReportDesigner_DesignPanelLoaded;
         }
 
-        public FrmLabelDesigner(RepositoryEtichetta etichetta, Action<byte[]> saveLayout, Type dataSourceType, int Larghezza, int Altezza,
+        public FrmLabelDesigner(RepositoryEtichetta etichetta, Action<byte[], int?> saveLayout, Type dataSourceType, int Larghezza, int Altezza,
             Func<object> previewDataFactory = null) : this()
         {
             _saveLayout = saveLayout ?? throw new ArgumentNullException(nameof(saveLayout));
@@ -363,7 +365,48 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                 try
                 {
                     byte[] layout = GetLayout(_panel);
-                    _owner._saveLayout(layout);
+                    int? versioneConfermata = null;
+
+                    while (true)
+                    {
+                        try
+                        {
+                            _owner._saveLayout(layout, versioneConfermata);
+                            break;
+                        }
+                        catch (MainPresenter.ConflittoVersioneEtichettaException ex)
+                        {
+                            var scelta = XtraMessageBox.Show(_owner,
+                                $"Un altro utente ha salvato questa etichetta dopo la tua apertura.\r\n" +
+                                $"Versione aperta: {ex.VersioneAperta}. Versione nel database: {ex.VersioneCorrente}.\r\n\r\n" +
+                                "Sì: sovrascrivi la versione nel database con le tue modifiche.\r\n" +
+                                "No: scarta le tue modifiche e riapri la versione aggiornata.\r\n" +
+                                "Annulla: torna al designer mantenendo le tue modifiche senza salvarle.",
+                                "Conflitto di versione", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning,
+                                MessageBoxDefaultButton.Button3);
+
+                            if (scelta == DialogResult.Yes)
+                            {
+                                // La versione confermata viene ricontrollata nella nuova transazione.
+                                versioneConfermata = ex.VersioneCorrente;
+                                continue;
+                            }
+
+                            if (scelta == DialogResult.No)
+                            {
+                                _owner.ReloadRequested = true;
+                                _panel.ReportState = ReportState.Saved;
+                                _owner.BeginInvoke(new Action(() =>
+                                {
+                                    if (!_owner.IsDisposed && !_owner.Disposing)
+                                        _owner.Close();
+                                }));
+                            }
+
+                            return;
+                        }
+                    }
+
                     // Il pannello risulta salvato soltanto dopo il completamento della scrittura nel DB.
                     _owner._savedLayout = layout;
                     _panel.ReportState = ReportState.Saved;

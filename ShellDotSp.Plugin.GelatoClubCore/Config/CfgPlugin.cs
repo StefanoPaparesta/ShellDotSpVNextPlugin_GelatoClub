@@ -1,4 +1,6 @@
-﻿using ShellDotSp.Core.Config;
+﻿using DotSpExtensions;
+
+using ShellDotSp.Core.Config;
 
 namespace ShellDotSp.Plugin.GelatoClubCore.Config
 {
@@ -8,5 +10,6 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Config
 
         public string Cliente { get => ItemsDic[nameof(Cliente)].Valore; }
         public string RepositoryEtichette { get => ItemsDic[nameof(RepositoryEtichette)].Valore; }
+        public bool AbilitaImporFileEtichette { get => ItemsDic[nameof(AbilitaImporFileEtichette)].Valore.To<bool>(); }
     }
 }

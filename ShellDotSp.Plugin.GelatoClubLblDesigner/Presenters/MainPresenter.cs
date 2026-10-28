@@ -1,4 +1,4 @@
-using ShellDotSp.Core.Base;
+﻿using ShellDotSp.Core.Base;
 using ShellDotSp.Core.Model;
 using ShellDotSp.Plugin.GelatoClubCore.Config;
 using ShellDotSp.Plugin.GelatoClubCore.Model;
@@ -64,6 +64,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             int importate = 0;
 
             Repository.StartConversation();
+
             try
             {
                 var codiciEsistenti = new HashSet<string>(
@@ -74,6 +75,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
                 foreach (string file in files)
                 {
                     string codice = Path.GetFileNameWithoutExtension(file);
+
                     if (codiciEsistenti.Contains(codice))
                         continue;
 
@@ -85,7 +87,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
                         Versione = 1,
                         Layout = File.ReadAllBytes(file)
                     });
+
                     codiciEsistenti.Add(codice);
+
                     importate++;
                 }
 
@@ -98,6 +102,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             }
 
             LoadEtichette();
+
             return importate;
         }
 
@@ -116,7 +121,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             return etichetta;
         }
 
-        internal void SalvaLayoutEtichetta(RepositoryEtichetta etichetta, byte[] layout)
+        internal void SalvaLayoutEtichetta(RepositoryEtichetta etichetta, byte[] layout, int? versioneConfermata = null)
         {
             if (etichetta == null)
                 throw new ArgumentNullException(nameof(etichetta));
@@ -132,8 +137,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
                     etichetta.Id).SingleOrDefault();
                 if (corrente == null)
                     throw new InvalidOperationException("L'etichetta non esiste più nel database.");
-                if (corrente.Versione != etichetta.Versione)
-                    throw new InvalidOperationException("Il layout è stato modificato da un altro utente. Riaprire il designer per caricare la versione aggiornata.");
+                if (corrente.Versione != (versioneConfermata ?? etichetta.Versione))
+                    throw new ConflittoVersioneEtichettaException(etichetta.Versione, corrente.Versione);
 
                 nuovaVersione = checked(corrente.Versione + 1);
                 Repository.Execute(
@@ -149,6 +154,19 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
 
             etichetta.Layout = layout;
             etichetta.Versione = nuovaVersione;
+        }
+
+        internal sealed class ConflittoVersioneEtichettaException : InvalidOperationException
+        {
+            public int VersioneAperta { get; }
+            public int VersioneCorrente { get; }
+
+            public ConflittoVersioneEtichettaException(int versioneAperta, int versioneCorrente)
+                : base("Un altro utente ha salvato una versione più recente dell'etichetta.")
+            {
+                VersioneAperta = versioneAperta;
+                VersioneCorrente = versioneCorrente;
+            }
         }
 
         internal void SetEtichetta(RepositoryEtichetta etichetta)
@@ -214,46 +232,43 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters
             return Repository.Query<TabellaLookUp>(sql, "FormatiEtichette").ToList();
         }
 
-        internal void ClonaEtichetta(string codicePrecente, string codiceNuovo, string note)
+        internal void ClonaEtichetta(string codiceNuovo)
         {
-            //try
-            //{
-            //    Repository.StartConversation();
+            if (EtichettaSelezionata == null)
+                throw new InvalidOperationException("Selezionare un'etichetta da clonare.");
 
-            //    TabellaLookUp etichetta = new TabellaLookUp
-            //    {
-            //        Tabella = "Etichette",
-            //        Codice = codiceNuovo,
-            //        Valore = codiceNuovo,
-            //        CodiceNumerico = 1,
-            //        ValoreStr1 = EtichettaSelezionata.ValoreStr1,
-            //        Note = note,
-            //    };
+            if (!Forms.FrmEtichetta.TryValidaCodice(codiceNuovo, out string erroreCodice))
+                throw new ArgumentException(erroreCodice, nameof(codiceNuovo));
 
-            //    Repository.Insert(etichetta);
+            codiceNuovo = codiceNuovo.Trim();
 
-            //    string fileNameRepositoryPrec = Path.Combine(_cfg.RepositoryEtichette, EtichettaSelezionata.Codice + ".repx");
-            //    string fileNameLayoutPrec = Path.Combine(_paths.Etichette, EtichettaSelezionata.Codice + ".repx");
+            Repository.StartConversation();
 
-            //    string fileNameRepositoryNuovo = Path.Combine(_cfg.RepositoryEtichette, codiceNuovo + ".repx");
-            //    string fileNameLayoutNuovo = Path.Combine(_paths.Etichette, codiceNuovo + ".repx");
+            try
+            {
+                var originale = Repository.Query<RepositoryEtichetta>(
+                    "SELECT * FROM RepositoryEtichette WHERE Id=@0", EtichettaSelezionata.Id).SingleOrDefault();
+                if (originale == null)
+                    throw new InvalidOperationException("L'etichetta da clonare non esiste più nel database.");
+                if (Repository.Query<RepositoryEtichetta>(
+                    "SELECT Id FROM RepositoryEtichette WITH (UPDLOCK, HOLDLOCK) WHERE Codice=@0", codiceNuovo).Any())
+                    throw new InvalidOperationException("Esiste già un'etichetta con il codice indicato.");
 
-            //    if (File.Exists(fileNameRepositoryNuovo))
-            //        File.Delete(fileNameRepositoryNuovo);
-
-            //    if (File.Exists(fileNameLayoutNuovo))
-            //        File.Delete(fileNameLayoutNuovo);
-
-            //    File.Copy(fileNameRepositoryPrec, fileNameRepositoryNuovo);
-            //    File.Copy(fileNameLayoutPrec, fileNameLayoutNuovo);
-
-            //    Repository.StopConversation();
-            //}
-            //catch (Exception)
-            //{
-            //    Repository.AbortConversation();
-            //    throw;
-            //}
+                Repository.Insert(new RepositoryEtichetta
+                {
+                    Codice = codiceNuovo,
+                    Descrizione = originale.Descrizione,
+                    StrutturaGs1 = originale.StrutturaGs1,
+                    Layout = originale.Layout,
+                    Versione = originale.Layout != null && originale.Layout.Length > 0 ? 1 : 0
+                });
+                Repository.StopConversation();
+            }
+            catch
+            {
+                Repository.AbortConversation();
+                throw;
+            }
         }
     }
 }

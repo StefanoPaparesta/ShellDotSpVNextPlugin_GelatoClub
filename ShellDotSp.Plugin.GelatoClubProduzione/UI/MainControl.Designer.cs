@@ -812,7 +812,7 @@
             // 
             // bndEtichette
             // 
-            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaCollection);
+            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.RepositoryEtichettaCollection);
             // 
             // bndLinee
             // 
