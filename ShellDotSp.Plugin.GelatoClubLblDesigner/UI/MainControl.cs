@@ -14,6 +14,7 @@ using ShellDotSp.Plugin.GelatoClubLblDesigner.Presenters;
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -25,6 +26,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
     public partial class MainControlShellLabelDesigner : UserControl, IMainView
     {
 
+        private static int _reportOpeningCount;
         private MainPresenter _presenter;
         private MsgBoxHelper _msg = new MsgBoxHelper("Designer");
 
@@ -159,6 +161,10 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                     }
                 }
 
+                int openingNumber = System.Threading.Interlocked.Increment(ref _reportOpeningCount);
+                var openingWatch = Stopwatch.StartNew();
+                Log.Info().Message("REPORT_OPEN inizio apertura={0} primaApertura={1} file={2}",
+                    openingNumber, openingNumber == 1, fileName).Write();
                 var parentForm = FindForm();
 
                 using (var wait = new DevExpress.XtraSplashScreen.SplashScreenManager(parentForm, typeof(WaitForm1), false, false))
@@ -174,6 +180,10 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.UI
                             {
                                 if (wait.IsSplashFormVisible)
                                     wait.CloseWaitForm();
+                                openingWatch.Stop();
+                                Log.Info().Message("REPORT_OPEN finestra mostrata id={0} apertura={1} primaApertura={2} file={3} totaleMs={4}",
+                                    designer.OpeningId, openingNumber, openingNumber == 1, fileName,
+                                    openingWatch.ElapsedMilliseconds).Write();
                             };
                             designer.Shown += shown;
                             designer.EtichettaSalvata += Designer_EtichettaSalvata;

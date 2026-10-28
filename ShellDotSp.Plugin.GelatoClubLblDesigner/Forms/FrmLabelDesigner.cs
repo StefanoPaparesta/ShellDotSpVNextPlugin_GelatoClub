@@ -13,6 +13,7 @@ using ShellDotSp.Plugin.GelatoClubCore.Config;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Drawing.Design;
 using System.Drawing.Printing;
 using System.IO;
@@ -47,6 +48,21 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
         public event EventHandler<EtichettaSalvataEventArgs> EtichettaSalvata;
 
+        private readonly Stopwatch _openingWatch = Stopwatch.StartNew();
+        private long _lastOpeningMilliseconds;
+        private string _openingFileName;
+        private readonly string _openingId = Guid.NewGuid().ToString("N");
+
+        public string OpeningId => _openingId;
+
+        private void LogOpeningStage(string stage)
+        {
+            long elapsed = _openingWatch.ElapsedMilliseconds;
+            _logger.Info("REPORT_OPEN id={id} file={file} fase={fase} durataFaseMs={durataFaseMs} totaleDesignerMs={totaleDesignerMs}",
+                _openingId, _openingFileName, stage, elapsed - _lastOpeningMilliseconds, elapsed);
+            _lastOpeningMilliseconds = _openingWatch.ElapsedMilliseconds;
+        }
+
         private byte[] _savedLayout;
         private readonly Type _dataSourceType;
         private readonly Func<object> _previewDataFactory;
@@ -57,6 +73,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
         public FrmLabelDesigner()
         {
             InitializeComponent();
+            LogOpeningStage("InitializeComponent");
 
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReport, CommandVisibility.None);
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReportWizard, CommandVisibility.None);
@@ -90,23 +107,30 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             if (string.IsNullOrWhiteSpace(fileName))
                 throw new ArgumentException("Specificare il percorso del REPX.", nameof(fileName));
 
+            _openingFileName = fileName;
+            LogOpeningStage("Inizio caricamento report");
+
             if (File.Exists(fileName))
             {
                 string fName = Path.GetFileNameWithoutExtension(fileName);
                 var existingReport = new XtraReport();
                 try
                 {
+                    LogOpeningStage("Creazione XtraReport");
                     existingReport.LoadLayoutFromXml(fileName);
+                    LogOpeningStage("LoadLayoutFromXml");
                     bool nomeModificato = existingReport.Name != fName || existingReport.DisplayName != fName;
                     // Imposta il nome prima che il designer crei il componente e il titolo del documento.
                     existingReport.Name = fName;
                     existingReport.DisplayName = fName;
                     reportDesigner1.OpenReport(existingReport);
+                    LogOpeningStage("OpenReport inclusa configurazione pannelli e sorgente dati");
                     reportDesigner1.ActiveDesignPanel.FileName = Path.GetFullPath(fileName);
                     reportDesigner1.ActiveDesignPanel.ReportState = nomeModificato
                         ? ReportState.Changed : ReportState.Saved;
                     if (!nomeModificato)
                         _savedLayout = GetLayout(reportDesigner1.ActiveDesignPanel);
+                    LogOpeningStage("Stato report e snapshot layout");
                 }
                 catch
                 {
@@ -146,7 +170,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
             try
             {
+                LogOpeningStage("Creazione nuovo report");
                 reportDesigner1.OpenReport(report);
+                LogOpeningStage("OpenReport nuovo report");
                 reportDesigner1.ActiveDesignPanel.FileName = Path.GetFullPath(fileName);
                 reportDesigner1.ActiveDesignPanel.ReportState = ReportState.Changed;
             }
@@ -164,6 +190,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             // Il designer ripristina il layout durante l'apertura: applica la vista dopo il caricamento.
             ConfigureDockPanels();
             BeginInvoke(new Action(CollapseBottomPanels));
+            LogOpeningStage("OnShown completato");
+            _openingWatch.Stop();
         }
 
         private void CollapseBottomPanels()
