@@ -33,7 +33,6 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainControlGelatoClubProduzione));
             this.lkLinee = new DevExpress.XtraEditors.LookUpEdit();
-            this.bndLinee = new System.Windows.Forms.BindingSource(this.components);
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             this.lblTitoloArticolo = new DevExpress.XtraEditors.LabelControl();
             this.lblArticolo = new DevExpress.XtraEditors.LabelControl();
@@ -70,9 +69,7 @@
             this.labelControl17 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl19 = new DevExpress.XtraEditors.LabelControl();
             this.lkDescrizione1 = new DevExpress.XtraEditors.LookUpEdit();
-            this.bndDescrizione1 = new System.Windows.Forms.BindingSource(this.components);
             this.lkDescrizione2 = new DevExpress.XtraEditors.LookUpEdit();
-            this.bndDescrizione2 = new System.Windows.Forms.BindingSource(this.components);
             this.btnManageDesc1 = new DevExpress.XtraEditors.SimpleButton();
             this.btnManageDesc2 = new DevExpress.XtraEditors.SimpleButton();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -80,26 +77,30 @@
             this.btnImportaTesti = new DevExpress.XtraEditors.SimpleButton();
             this.labelControl18 = new DevExpress.XtraEditors.LabelControl();
             this.lkEtichette = new DevExpress.XtraEditors.LookUpEdit();
-            this.bndEtichette = new System.Windows.Forms.BindingSource(this.components);
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.btnAnteprima = new DevExpress.XtraEditors.SimpleButton();
+            this.bndDescrizione1 = new System.Windows.Forms.BindingSource(this.components);
+            this.bndDescrizione2 = new System.Windows.Forms.BindingSource(this.components);
+            this.bndEtichette = new System.Windows.Forms.BindingSource(this.components);
+            this.bndLinee = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.lkLinee.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione1.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione2.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lkEtichette.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).BeginInit();
             this.SuspendLayout();
             // 
             // lkLinee
@@ -124,10 +125,6 @@
             this.lkLinee.Size = new System.Drawing.Size(327, 30);
             this.lkLinee.TabIndex = 0;
             this.lkLinee.EditValueChanged += new System.EventHandler(this.lkLinee_EditValueChanged);
-            // 
-            // bndLinee
-            // 
-            this.bndLinee.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.LookUpDataCollection);
             // 
             // labelControl1
             // 
@@ -597,10 +594,6 @@
             this.lkDescrizione1.TabIndex = 52;
             this.lkDescrizione1.EditValueChanged += new System.EventHandler(this.lkDescrizione1_EditValueChanged);
             // 
-            // bndDescrizione1
-            // 
-            this.bndDescrizione1.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
-            // 
             // lkDescrizione2
             // 
             this.lkDescrizione2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -625,10 +618,6 @@
             this.lkDescrizione2.Size = new System.Drawing.Size(560, 30);
             this.lkDescrizione2.TabIndex = 53;
             this.lkDescrizione2.EditValueChanged += new System.EventHandler(this.lkDescrizione2_EditValueChanged);
-            // 
-            // bndDescrizione2
-            // 
-            this.bndDescrizione2.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
             // 
             // btnManageDesc1
             // 
@@ -729,10 +718,6 @@
             this.lkEtichette.TabIndex = 55;
             this.lkEtichette.EditValueChanged += new System.EventHandler(this.lkEtichette_EditValueChanged);
             // 
-            // bndEtichette
-            // 
-            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaCollection);
-            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 2;
@@ -797,12 +782,41 @@
             // 
             // panel4
             // 
+            this.panel4.Controls.Add(this.btnAnteprima);
             this.panel4.Controls.Add(this.btnInvia);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel4.Location = new System.Drawing.Point(0, 541);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(1234, 85);
             this.panel4.TabIndex = 58;
+            // 
+            // btnAnteprima
+            // 
+            this.btnAnteprima.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAnteprima.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.btnAnteprima.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("simpleButton1.ImageOptions.SvgImage")));
+            this.btnAnteprima.ImageOptions.SvgImageSize = new System.Drawing.Size(48, 48);
+            this.btnAnteprima.Location = new System.Drawing.Point(1156, 8);
+            this.btnAnteprima.Name = "btnAnteprima";
+            this.btnAnteprima.Size = new System.Drawing.Size(75, 68);
+            this.btnAnteprima.TabIndex = 21;
+            this.btnAnteprima.Click += new System.EventHandler(this.btnAnteprima_Click);
+            // 
+            // bndDescrizione1
+            // 
+            this.bndDescrizione1.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
+            // 
+            // bndDescrizione2
+            // 
+            this.bndDescrizione2.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaTestoCollection);
+            // 
+            // bndEtichette
+            // 
+            this.bndEtichette.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.EtichettaCollection);
+            // 
+            // bndLinee
+            // 
+            this.bndLinee.DataSource = typeof(ShellDotSp.Plugin.GelatoClubCore.Model.LookUpDataCollection);
             // 
             // MainControlGelatoClubProduzione
             // 
@@ -815,23 +829,23 @@
             this.Name = "MainControlGelatoClubProduzione";
             this.Size = new System.Drawing.Size(1234, 626);
             ((System.ComponentModel.ISupportInitialize)(this.lkLinee.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties.CalendarTimeProperties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txDataConfezionamento.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione1.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lkDescrizione2.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lkEtichette.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.panel4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndDescrizione2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndEtichette)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bndLinee)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -891,5 +905,6 @@
         private DevExpress.XtraEditors.LookUpEdit lkEtichette;
         private DevExpress.XtraEditors.SimpleButton btnImportaTesti;
         private DevExpress.XtraEditors.SimpleButton btnDataManuale;
+        private DevExpress.XtraEditors.SimpleButton btnAnteprima;
     }
 }

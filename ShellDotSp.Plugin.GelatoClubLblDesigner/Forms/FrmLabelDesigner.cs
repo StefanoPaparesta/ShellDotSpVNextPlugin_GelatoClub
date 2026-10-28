@@ -44,6 +44,21 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                 "Character Comb"
             };
 
+        private readonly Stopwatch _openingWatch = Stopwatch.StartNew();
+        private long _lastOpeningMilliseconds;
+        private string _openingLabelCode;
+        private readonly string _openingId = Guid.NewGuid().ToString("N");
+
+        public string OpeningId => _openingId;
+
+        private void LogOpeningStage(string stage)
+        {
+            long elapsed = _openingWatch.ElapsedMilliseconds;
+            _logger.Info("REPORT_OPEN id={id} etichetta={etichetta} fase={fase} durataFaseMs={durataFaseMs} totaleDesignerMs={totaleDesignerMs}",
+                _openingId, _openingLabelCode, stage, elapsed - _lastOpeningMilliseconds, elapsed);
+            _lastOpeningMilliseconds = _openingWatch.ElapsedMilliseconds;
+        }
+
         private byte[] _savedLayout;
         private readonly Type _dataSourceType;
         private readonly Func<object> _previewDataFactory;
@@ -55,7 +70,7 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
         {
             var timer = Stopwatch.StartNew();
             InitializeComponent();
-            _logger.Info($"Apertura designer: inizializzazione controlli {timer.ElapsedMilliseconds} ms.");
+            LogOpeningStage("InitializeComponent");
 
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReport, CommandVisibility.None);
             reportDesigner1.SetCommandVisibility(ReportCommand.NewReportWizard, CommandVisibility.None);
@@ -85,6 +100,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             if (etichetta == null || string.IsNullOrWhiteSpace(etichetta.Codice))
                 throw new ArgumentException("Specificare un'etichetta con un codice valido.", nameof(etichetta));
 
+            _openingLabelCode = etichetta.Codice;
+            LogOpeningStage("Inizio caricamento report da repository");
+
             if (etichetta.Layout != null && etichetta.Layout.Length > 0)
             {
                 string fName = etichetta.Codice;
@@ -94,21 +112,21 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
                     var timer = Stopwatch.StartNew();
                     using (var stream = new MemoryStream(etichetta.Layout, false))
                         existingReport.LoadLayoutFromXml(stream);
-                    _logger.Info($"Apertura designer: caricamento XML {timer.ElapsedMilliseconds} ms.");
+                    LogOpeningStage("LoadLayoutFromXml da repository");
                     bool nomeModificato = existingReport.Name != fName || existingReport.DisplayName != fName;
                     // Imposta il nome prima che il designer crei il componente e il titolo del documento.
                     existingReport.Name = fName;
                     existingReport.DisplayName = fName;
                     timer.Restart();
                     reportDesigner1.OpenReport(existingReport);
-                    _logger.Info($"Apertura designer: OpenReport {timer.ElapsedMilliseconds} ms.");
+                    LogOpeningStage("OpenReport inclusa configurazione pannelli e sorgente dati");
                     reportDesigner1.ActiveDesignPanel.ReportState = nomeModificato
                         ? ReportState.Changed : ReportState.Saved;
                     if (!nomeModificato)
                     {
                         timer.Restart();
                         _savedLayout = GetLayout(reportDesigner1.ActiveDesignPanel);
-                        _logger.Info($"Apertura designer: snapshot layout {timer.ElapsedMilliseconds} ms.");
+                        LogOpeningStage("Stato report e snapshot layout");
                     }
                 }
                 catch
@@ -149,7 +167,9 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
 
             try
             {
+                LogOpeningStage("Creazione nuovo report");
                 reportDesigner1.OpenReport(report);
+                LogOpeningStage("OpenReport nuovo report");
                 reportDesigner1.ActiveDesignPanel.ReportState = ReportState.Changed;
             }
             catch
@@ -168,6 +188,8 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             ConfigureDockPanels();
             _logger.Info($"Apertura designer: pannelli OnShown {timer.ElapsedMilliseconds} ms.");
             BeginInvoke(new Action(CollapseBottomPanels));
+            LogOpeningStage("OnShown completato");
+            _openingWatch.Stop();
         }
 
         private void CollapseBottomPanels()

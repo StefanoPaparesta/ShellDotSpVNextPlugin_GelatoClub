@@ -31,7 +31,13 @@ namespace ShellDotSp.Plugin.GelatoClubCore.Helpers
                 DescrCommercialeTEDESCO = src.DescrCommercialeTEDESCO,
                 DescrCommercialeXXX = src.DescrCommercialeXXX,
                 VolUMP = src.VolUMP,
-                QuantBarcode = src.QuantBarcode
+                QuantBarcode = src.QuantBarcode,
+                NoteConservazioneITA = src.NoteConservazioneITA,
+                NoteConservazioneFRANCESE = src.NoteConservazioneFRANCESE,
+                NoteConservazioneINGLESE = src.NoteConservazioneINGLESE,
+                NoteConservazioneSPAGNOLO = src.NoteConservazioneSPAGNOLO,
+                NoteConservazioneTEDESCO = src.NoteConservazioneTEDESCO,
+                NoteConservazioneXXX = src.NoteConservazioneXXX
             };
         }
     }

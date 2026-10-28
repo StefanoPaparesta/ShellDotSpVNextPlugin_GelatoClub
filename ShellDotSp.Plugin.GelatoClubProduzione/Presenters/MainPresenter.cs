@@ -1,4 +1,5 @@
-﻿using DevExpress.XtraReports.UI;
+﻿using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.UI;
 
 using NPoco;
 
@@ -30,6 +31,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
         public DateTime DataConfezionamento { get; set; }
         public DateTime DataScadenza { get; set; }
         public string CodiceBarcode { get; set; }
+        public bool TestStampante { get; set; } = false;
 
         public List<EtichettaTesto> Testi1 = new List<EtichettaTesto>();
         public List<LookUpdataTesto> TestiStandard1 = new List<LookUpdataTesto>();
@@ -188,7 +190,7 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             }
         }
 
-        internal ReturnValue InviaArticoloInProduzione()
+        internal ReturnValue InviaArticoloInProduzione(bool anteprima = false)
         {
             ReturnValue returnValue = new ReturnValue();
 
@@ -265,13 +267,18 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
                 {
                     List<ReportData> ds = new List<ReportData> { reportData };
 
+
                     using (XtraReport report = new XtraReport())
                     {
 
                         report.LoadLayout(fileName);
                         report.DataSource = ds;
-                        StampaReport(report, 10000, stampante.Valore);
+
+                        short numeroCopie = TestStampante ? (short)1 : (short)10000;
+
+                        StampaReport(report, numeroCopie, stampante.Valore, anteprima);
                     }
+
                 }
                 else
                 {
@@ -294,16 +301,102 @@ namespace ShellDotSp.Plugin.GelatoClubProduzione.Presenters
             return returnValue;
         }
 
-        private void StampaReport(XtraReport report, short numeroCopie, string nomeStampante)
+        private void StampaReport(XtraReport report, short numeroCopie, string nomeStampante, bool anteprima = false)
         {
-            using (ReportPrintTool printTool = new ReportPrintTool(report))
+            // Seleziona la stampante della linea prima che venga generato il documento.
+            var impostazioniStampante = new System.Drawing.Printing.PrinterSettings
             {
-                printTool.PrintingSystem.StartPrint += (s, e) =>
-                {
-                    e.PrintDocument.PrinterSettings.Copies = numeroCopie;
-                };
+                PrinterName = nomeStampante
+            };
+            if (!impostazioniStampante.IsValid)
+                throw new InvalidOperationException($"Stampante non disponibile: {nomeStampante}");
 
-                printTool.Print(nomeStampante);
+            report.PrinterName = nomeStampante;
+            bool usaFormatoStampante = report.DefaultPrinterSettingsUsing.UsePaperKind;
+            bool usaOrientamentoStampante = report.DefaultPrinterSettingsUsing.UseLandscape;
+            var paginaStampante = impostazioniStampante.DefaultPageSettings;
+
+            // Risolvi le opzioni del REPX sul report, evitando le impostazioni globali di DevExpress.
+            report.DefaultPrinterSettingsUsing.UsePaperKind = false;
+            report.DefaultPrinterSettingsUsing.UseLandscape = false;
+            try
+            {
+                // Landscape scambia le dimensioni: assegnalo prima del formato esplicito.
+                if (usaOrientamentoStampante)
+                    report.Landscape = paginaStampante.Landscape;
+
+                if (usaFormatoStampante)
+                {
+                    var formato = paginaStampante.PaperSize;
+                    if (formato.Width <= 0 || formato.Height <= 0)
+                        throw new InvalidOperationException($"Formato carta non valido per {nomeStampante}");
+
+                    double fattore;
+                    switch (report.ReportUnit)
+                    {
+                        case ReportUnit.TenthsOfAMillimeter:
+                            fattore = 2.54; // Il driver espone centesimi di pollice.
+                            break;
+                        case ReportUnit.HundredthsOfAnInch:
+                            fattore = 1;
+                            break;
+                        case ReportUnit.Pixels:
+                            fattore = 0.96; // ReportUnit.Pixels usa 96 DPI.
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Unita report non supportata: {report.ReportUnit}");
+                    }
+
+                    report.PaperKind = System.Drawing.Printing.PaperKind.Custom;
+                    report.PaperName = formato.PaperName;
+                    report.PageWidth = (int)Math.Round((report.Landscape ? formato.Height : formato.Width) * fattore);
+                    report.PageHeight = (int)Math.Round((report.Landscape ? formato.Width : formato.Height) * fattore);
+                }
+                Log.Info("Prima generazione: report={report}, larghezza={larghezza}, altezza={altezza}, unita={unita}, landscape={landscape}",
+                    report.Name, report.PageWidth, report.PageHeight, report.ReportUnit, report.Landscape);
+                report.CreateDocument();
+                Log.Info("Documento generato: pagine={pagine}, larghezza={larghezza}, altezza={altezza}, unita={unita}, landscape={landscape}",
+                    report.PrintingSystem.Document.Pages.Count, report.PageWidth, report.PageHeight, report.ReportUnit, report.Landscape);
+
+                using (ReportPrintTool printTool = new ReportPrintTool(report))
+                {
+                    printTool.PrinterSettings.PrinterName = nomeStampante;
+                    // Imposta le copie prima della stampa, senza sostituire le impostazioni negli eventi.
+                    if (!anteprima)
+                        printTool.PrinterSettings.Copies = numeroCopie;
+
+                    printTool.PrintingSystem.StartPrint += (s, e) =>
+                    {
+                        var paginaEffettiva = e.PrintDocument.DefaultPageSettings;
+                        Log.Info("Pagina di stampa: pagineDocumento={pagine}, larghezza={larghezza}, altezza={altezza}, landscape={landscape}, areaStampabile={area}",
+                            report.PrintingSystem.Document.Pages.Count, paginaEffettiva.PaperSize.Width,
+                            paginaEffettiva.PaperSize.Height, paginaEffettiva.Landscape, paginaEffettiva.PrintableArea);
+
+                        Log.Info("Avvio stampa: stampante={stampante}, anteprima={anteprima}, copie={copie}, usaFormatoStampante={usaFormato}, usaOrientamentoStampante={usaOrientamento}, formatoDriver={formato}, larghezzaDriver={larghezza}, altezzaDriver={altezza}, landscapeDriver={landscape}",
+                            e.PrintDocument.PrinterSettings.PrinterName, anteprima,
+                            e.PrintDocument.PrinterSettings.Copies, usaFormatoStampante, usaOrientamentoStampante,
+                            paginaStampante.PaperSize.PaperName, paginaStampante.PaperSize.Width,
+                            paginaStampante.PaperSize.Height, paginaStampante.Landscape);
+                    };
+
+                    if (anteprima)
+                    {
+                        printTool.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.Print, CommandVisibility.None);
+                        printTool.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.PrintDirect, CommandVisibility.None);
+                        printTool.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.PrintSelection, CommandVisibility.None);
+
+                        printTool.ShowPreviewDialog();
+                    }
+                    else
+                    {
+                        printTool.Print(nomeStampante);
+                    }
+                }
+            }
+            finally
+            {
+                report.DefaultPrinterSettingsUsing.UsePaperKind = usaFormatoStampante;
+                report.DefaultPrinterSettingsUsing.UseLandscape = usaOrientamentoStampante;
             }
         }
 
