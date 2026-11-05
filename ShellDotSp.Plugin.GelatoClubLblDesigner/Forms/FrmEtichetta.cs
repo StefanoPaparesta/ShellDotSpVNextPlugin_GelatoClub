@@ -175,6 +175,11 @@ namespace ShellDotSp.Plugin.GelatoClubLblDesigner.Forms
             StrutturaGs1 = txStrutturaGs1.Text.ToDb();
             Note = txNote.Text.ToDb();
 
+            if (Note.IsNull())
+            {
+                Note = Codice;
+            }
+
             DialogResult = DialogResult.OK;
         }
     }
